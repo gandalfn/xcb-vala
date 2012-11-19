@@ -1,0 +1,12 @@
+AUTOMAKE_OPTIONS = subdir-objects
+
+INCLUDES = \
+    -I${top_srcdir}/src \
+    $(XCB_VALA_CFLAGS)
+
+AM_CFLAGS = \
+     -w -O3
+
+EXTRA_DIST =
+
+CLEANFILES =

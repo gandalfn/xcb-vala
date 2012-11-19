@@ -1,0 +1,5 @@
+include $(top_srcdir)/build/common.am
+
+VALAFLAGS = \
+    --thread \
+    --debug
