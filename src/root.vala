@@ -202,6 +202,7 @@ namespace XCBVala
             ValueType.add ("CARD32", "uint32");
             ValueType.add ("BYTE", "uint8");
             ValueType.add ("BOOL", "bool");
+            ValueType.add ("char", "char");
         }
 
         public void

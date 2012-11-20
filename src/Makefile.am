@@ -16,7 +16,11 @@ xcb_vala_parser_SOURCES = \
     enum.vala \
     item.vala \
     field.vala \
+    field-ref.vala \
     typedef.vala \
+    union.vala \
+    list.vala \
+    value-item.vala \
     xid-type.vala \
     xid-union.vala \
     xid-union-type.vala \

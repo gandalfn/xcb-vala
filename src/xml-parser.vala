@@ -45,6 +45,10 @@ namespace XCBVala
             XmlObject.register_object ("item", typeof (Item));
             XmlObject.register_object ("event", typeof (Event));
             XmlObject.register_object ("eventcopy", typeof (EventCopy));
+            XmlObject.register_object ("union", typeof (Union));
+            XmlObject.register_object ("list", typeof (List));
+            XmlObject.register_object ("value", typeof (ValueItem));
+            XmlObject.register_object ("fieldref", typeof (FieldRef));
         }
 
         // Methods

@@ -1,4 +1,4 @@
-/* field.vala
+/* union.vala
  *
  * Copyright (C) 2012  Nicolas Bruguier
  *
@@ -21,7 +21,7 @@
 
 namespace XCBVala
 {
-    public class Field : GLib.Object, XmlObject
+    public class Union : GLib.Object, XmlObject
     {
         // properties
         private Set<XmlObject> m_Childs;
@@ -29,7 +29,7 @@ namespace XCBVala
         // accessors
         protected string tag_name {
             get {
-                return "field";
+                return "union";
             }
         }
 
@@ -43,13 +43,14 @@ namespace XCBVala
 
         public string name           { get; set; default = null; }
         public int    pos            { get; set; default = 0; }
-        public string attrtype       { get; set; default = null; }
         public string characters     { get; set; default = null; }
-        public string mask           { get; set; default = null; }
-        public string @enum          { get; set; default = null; }
-        public bool   is_ref         { get; set; default = false; }
 
         // methods
+        construct
+        {
+            m_Childs = new Set<XmlObject> (XmlObject.compare);
+        }
+
         public void
         on_child_added (XmlObject inChild)
         {
@@ -58,20 +59,23 @@ namespace XCBVala
         public void
         on_end ()
         {
+            ValueType.add (name, Root.format_vala_name (name));
         }
 
         public string
         to_string (string inPrefix)
         {
-            if (!is_ref)
-            {
-                if (attrtype != null && ValueType.get (attrtype) != null)
-                    return inPrefix + "public %s %s;\n".printf (ValueType.get (attrtype), name);
-                else
-                    warning ("Type %s of %s not found", attrtype, name);
-            }
+            string ret = inPrefix + "[SimpleType, CCode (cname = \"xcb_%s_t\")]\n".printf (Root.format_c_name ((root as Root).extension_xname, name));
 
-            return "";
+            ret += inPrefix + "public struct %s\n".printf (Root.format_vala_name (name));
+            ret += inPrefix + "{\n";
+            foreach (unowned XmlObject child in childs_unsorted)
+            {
+                ret += child.to_string (inPrefix + "\t");
+            }
+            ret += inPrefix + "}\n";
+
+            return ret;
         }
     }
 }
