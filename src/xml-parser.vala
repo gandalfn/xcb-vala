@@ -43,6 +43,8 @@ namespace XCBVala
             XmlObject.register_object ("xidunion", typeof (XIDUnion));
             XmlObject.register_object ("enum", typeof (Enum));
             XmlObject.register_object ("item", typeof (Item));
+            XmlObject.register_object ("event", typeof (Event));
+            XmlObject.register_object ("eventcopy", typeof (EventCopy));
         }
 
         // Methods

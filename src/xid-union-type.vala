@@ -45,6 +45,7 @@ namespace XCBVala
         }
 
         public string name           { get; set; default = null; }
+        public int    pos            { get; set; default = 0; }
         public string characters     { get; set; default = null; }
 
         // methods

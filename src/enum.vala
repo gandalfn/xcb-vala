@@ -43,7 +43,9 @@ namespace XCBVala
         }
 
         public string name           { get; set; default = null; }
+        public int    pos            { get; set; default = 0; }
         public string characters     { get; set; default = null; }
+        public bool   is_mask        { get; set; default = false; }
 
         // methods
         construct
@@ -72,13 +74,20 @@ namespace XCBVala
         public string
         to_string (string inPrefix)
         {
-            string ret = inPrefix + "[CCode (cname = \"xcb_%s_t\", cprefix =  \"XCB_%s_\")]\n".printf (Root.format_c_name (name), Root.format_c_enum_name (name));
+            string ret = "";
+
+            if (name == "EventType")
+                ret += inPrefix + "[CCode (cname = \"uint8\", cprefix =  \"XCB_%s_\")]\n".printf (Root.format_c_enum_name ((root as Root).extension_xname, "Event"));
+            else if (!is_mask)
+                ret += inPrefix + "[CCode (cname = \"xcb_%s_t\", cprefix =  \"XCB_%s_\")]\n".printf (Root.format_c_name ((root as Root).extension_xname, name), Root.format_c_enum_name ((root as Root).extension_xname, name));
+            else
+                ret += inPrefix + "[Flags, CCode (cname = \"xcb_%s_t\", cprefix =  \"XCB_%s_\")]\n".printf (Root.format_c_name ((root as Root).extension_xname, name), Root.format_c_enum_name ((root as Root).extension_xname, name));
 
             ret += inPrefix + "public enum %s%s\n".printf (Root.format_vala_name (name), m_HaveTypeSuffix ? "Type" : "");
             ret += inPrefix + "{\n";
             int length = childs.length;
             int cpt = 0;
-            foreach (unowned XmlObject child in childs)
+            foreach (unowned XmlObject child in childs_unsorted)
             {
                 ret += child.to_string (inPrefix + "\t");
                 cpt++;

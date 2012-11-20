@@ -42,6 +42,7 @@ namespace XCBVala
         }
 
         public string name           { get; set; default = null; }
+        public int    pos            { get; set; default = 0; }
         public string attrtype       { get; set; default = null; }
         public string characters     { get; set; default = null; }
         public string mask           { get; set; default = null; }
@@ -63,6 +64,8 @@ namespace XCBVala
         {
             if (attrtype != null && ValueType.get (attrtype) != null)
                 return inPrefix + "public %s %s;\n".printf (ValueType.get (attrtype), name);
+            else
+                warning ("Type %s of %s not found", attrtype, name);
 
             return "";
         }

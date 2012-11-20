@@ -81,6 +81,7 @@ namespace XCBVala
         protected abstract unowned Set<XmlObject>? childs { get; }
 
         public abstract string name { get; set; }
+        public abstract int pos { get; set; }
         public abstract string characters { get; set; }
         public string characters_unformatted {
             owned get {
@@ -111,6 +112,16 @@ namespace XCBVala
             }
         }
 
+        public GLib.List<unowned XmlObject> childs_unsorted {
+            owned get {
+                GLib.List<unowned XmlObject> ret = new GLib.List<unowned XmlObject> ();
+                foreach (unowned XmlObject child in this)
+                {
+                    ret.insert_sorted (child, compare_with_pos);
+                }
+                return ret;
+            }
+        }
         // static properties
         private static Set<TagFactory> s_Factory;
 
@@ -177,7 +188,6 @@ namespace XCBVala
                     previous_is_upper = false;
                 }
             }
-            message ("%s -> %s", inName, ret.str);
 
             return ret.str == "type" ? "attrtype" : ret.str;
         }
@@ -207,6 +217,12 @@ namespace XCBVala
         }
 
         // methods
+        private int
+        compare_with_pos (XmlObject inObject)
+        {
+            return pos - inObject.pos;
+        }
+
         /**
          * Parse xml for this object
          *
@@ -230,7 +246,6 @@ namespace XCBVala
                                 XmlObject item = create (inParser.element, params);
                                 if (item != null)
                                 {
-                                    message ("add %s %s", tag_name, inParser.element);
                                     append_child (item);
                                     item.parse (inParser);
                                 }
@@ -310,8 +325,32 @@ namespace XCBVala
             if (!(inChild in childs))
             {
                 childs.insert (inChild);
+                inChild.pos = childs.length - 1;
                 inChild.parent = this;
                 on_child_added (inChild);
+            }
+        }
+
+        /**
+         * Remove a child item to Object
+         *
+         * @param inObject child object to remove
+         */
+        public void
+        remove_child (XmlObject inChild)
+        {
+            if (inChild in childs)
+            {
+                int pos = inChild.pos;
+                foreach (unowned XmlObject child in this)
+                {
+                    if (child.pos > pos);
+                    {
+                        child.pos--;
+                    }
+                }
+                inChild.parent = null;
+                childs.remove (inChild);
             }
         }
 

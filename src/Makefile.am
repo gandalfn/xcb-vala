@@ -11,6 +11,8 @@ xcb_vala_parser_SOURCES = \
     value-type.vala \
     root.vala \
     class.vala \
+    event.vala \
+    event-copy.vala \
     enum.vala \
     item.vala \
     field.vala \

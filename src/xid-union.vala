@@ -42,6 +42,7 @@ namespace XCBVala
         }
 
         public string name           { get; set; default = null; }
+        public int    pos            { get; set; default = 0; }
         public string characters     { get; set; default = null; }
         public string base_type      { get; set; default = "uint32"; }
 
@@ -69,7 +70,6 @@ namespace XCBVala
             {
                 if (child is XIDUnionType)
                 {
-                    message ("Find %s", child.characters);
                     foreach (unowned XIDType xidtype in xidtypes)
                     {
                         if (xidtype.name == child.characters)
@@ -85,7 +85,7 @@ namespace XCBVala
         public string
         to_string (string inPrefix)
         {
-            string ret = inPrefix + "[CCode (cname = \"xcb_%s_t\")]\n".printf (Root.format_c_name (name));
+            string ret = inPrefix + "[CCode (cname = \"xcb_%s_t\")]\n".printf (Root.format_c_name ((root as Root).extension_xname, name));
 
             ret += inPrefix + "public struct %s : %s\n".printf (Root.format_vala_name (name), base_type);
             ret += inPrefix + "{\n";

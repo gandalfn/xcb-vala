@@ -1,4 +1,4 @@
-/* item.vala
+/* event-copy.vala
  *
  * Copyright (C) 2012  Nicolas Bruguier
  *
@@ -21,7 +21,7 @@
 
 namespace XCBVala
 {
-    public class Item : GLib.Object, XmlObject
+    public class EventCopy : GLib.Object, XmlObject
     {
         // properties
         private Set<XmlObject> m_Childs;
@@ -29,7 +29,7 @@ namespace XCBVala
         // accessors
         protected string tag_name {
             get {
-                return "item";
+                return "eventcopy";
             }
         }
 
@@ -44,6 +44,8 @@ namespace XCBVala
         public string name           { get; set; default = null; }
         public int    pos            { get; set; default = 0; }
         public string characters     { get; set; default = null; }
+        public int    number         { get; set; default = 0; }
+        public new string @ref       { get; set; default = null; }
 
         // methods
         construct
@@ -64,13 +66,7 @@ namespace XCBVala
         public string
         to_string (string inPrefix)
         {
-            bool is_numeric;
-            string ret = inPrefix + Root.format_vala_enum_name (name, out is_numeric);
-            if (is_numeric && parent is Enum)
-            {
-                ret = inPrefix + "[CCode (cname = \"XCB_%s_%s\")]\n".printf (Root.format_c_enum_name ((root as Root).extension_xname, parent.name), Root.format_c_enum_name ((root as Root).extension_xname, name)) + ret;
-            }
-            return ret;
+            return "";
         }
     }
 }

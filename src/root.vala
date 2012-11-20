@@ -41,11 +41,13 @@ namespace XCBVala
             }
         }
 
-        public string name           { get; set; default = null; }
-        public string characters     { get; set; default = null; }
+        public string name            { get; set; default = null; }
+        public int    pos             { get; set; default = 0; }
+        public string characters      { get; set; default = null; }
 
-        public string header         { get; set; default = null; }
-        public string extension_name { get; set; default = null; }
+        public string header          { get; set; default = null; }
+        public string extension_name  { get; set; default = null; }
+        public string extension_xname { get; set; default = null; }
 
         // static methods
         public static string
@@ -136,7 +138,7 @@ namespace XCBVala
         }
 
         public static string
-        format_c_name (string inName)
+        format_c_name (string? inExtensionName, string inName)
         {
             GLib.StringBuilder ret = new GLib.StringBuilder("");
             bool previous_is_upper = true;
@@ -158,11 +160,11 @@ namespace XCBVala
                 }
             }
 
-            return ret.str;
+            return inExtensionName != null ? format_c_name (null, inExtensionName) + "_" + ret.str : ret.str;
         }
 
         public static string
-        format_c_enum_name (string inName)
+        format_c_enum_name (string? inExtensionName, string inName)
         {
             GLib.StringBuilder ret = new GLib.StringBuilder("");
             bool previous_is_upper = true;
@@ -184,7 +186,7 @@ namespace XCBVala
                 }
             }
 
-            return ret.str;
+            return inExtensionName != null ? format_c_enum_name (null, inExtensionName) + "_" + ret.str : ret.str;
         }
 
         // methods
@@ -210,6 +212,69 @@ namespace XCBVala
         public void
         on_end ()
         {
+            GLib.List<unowned Field> fields = find_childs_of_type<unowned Field> ();
+            GLib.List<unowned Enum> enums = find_childs_of_type<unowned Enum> ();
+
+            foreach (unowned Field field in fields)
+            {
+                if (field.mask != null)
+                {
+                    foreach (unowned Enum @enum in enums)
+                    {
+                        if (@enum.name == field.mask)
+                        {
+                            @enum.is_mask = true;
+                            field.attrtype = @enum.name;
+                            break;
+                        }
+                    }
+                }
+                else if (field.@enum != null)
+                {
+                    foreach (unowned Enum @enum in enums)
+                    {
+                        if (@enum.name == field.@enum)
+                        {
+                            field.attrtype = @enum.name;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            GLib.List<unowned EventCopy> event_copys = find_childs_of_type<unowned EventCopy> ();
+            GLib.List<unowned Event> events = find_childs_of_type<unowned Event> ();
+            foreach (unowned EventCopy event_copy in event_copys)
+            {
+                if (event_copy.@ref != null)
+                {
+                    foreach (unowned Event event in events)
+                    {
+                        if (event.name == event_copy.@ref)
+                        {
+                            Event copy = event.copy (event_copy.name, event_copy.number);
+                            remove_child (event_copy);
+                            append_child (copy);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            events = find_childs_of_type<unowned Event> ();
+            events.sort (Event.compare_number);
+
+            Enum event_enum = new Enum ();
+            event_enum.name = "EventType";
+            append_child (event_enum);
+
+            foreach (unowned Event event in events)
+            {
+                Item item = new Item ();
+                item.name = event.name;
+
+                event_enum.append_child (item);
+            }
         }
 
         public string
@@ -226,7 +291,8 @@ namespace XCBVala
                 ret += inPrefix + "namespace Xcb\n";
 
             ret += inPrefix + "{\n";
-            foreach (unowned XmlObject child in m_Childs)
+
+            foreach (unowned XmlObject child in childs_unsorted)
             {
                 ret += child.to_string (inPrefix + "\t");
                 ret += "\n";

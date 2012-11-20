@@ -50,6 +50,7 @@ namespace XCBVala
             }
         }
 
+        public int    pos            { get; set; default = 0; }
         public string characters     { get; set; default = null; }
         public string newname        { get; set; default = null; }
         public string oldname        { get; set; default = null; }
@@ -75,7 +76,7 @@ namespace XCBVala
         public string
         to_string (string inPrefix)
         {
-            string ret = inPrefix + "[SimpleType, CCode (cname = \"xcb_%s_t\")]\n".printf (Root.format_c_name (newname));
+            string ret = inPrefix + "[SimpleType, CCode (cname = \"xcb_%s_t\")]\n".printf (Root.format_c_name ((root as Root).extension_xname, newname));
 
             ret += inPrefix + "public struct %s : %s\n".printf (Root.format_vala_name (name), ValueType.get (oldname));
             ret += inPrefix + "{\n";

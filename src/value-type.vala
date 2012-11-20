@@ -35,7 +35,6 @@ namespace XCBVala
         add (string inName, string inVal)
         {
             ValueType val = new ValueType (inName, inVal);
-            message ("Insert %s %s", inName, inVal);
             s_Types.insert (val);
         }
 
@@ -45,8 +44,6 @@ namespace XCBVala
             unowned ValueType? val = s_Types.search<string> (inName, (o, v) => {
                 return o.m_Name.ascii_casecmp (v);
             });
-
-            message ("Search %s %s", inName, val != null ? val.m_Val : "not found");
 
             return val != null ? val.m_Val : null;
         }

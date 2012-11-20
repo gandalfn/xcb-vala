@@ -42,6 +42,7 @@ namespace XCBVala
         }
 
         public string name           { get; set; default = null; }
+        public int    pos            { get; set; default = 0; }
         public string characters     { get; set; default = null; }
 
         // methods
@@ -53,7 +54,6 @@ namespace XCBVala
         public void
         on_child_added (XmlObject inChild)
         {
-            message ("Add %s", inChild.tag_name);
         }
 
         public void
@@ -64,13 +64,12 @@ namespace XCBVala
         public string
         to_string (string inPrefix)
         {
-            string ret = inPrefix + "[Compact, CCode (cname = \"xcb_%s_t\")]\n".printf (Root.format_c_name (name));
+            string ret = inPrefix + "[Compact, CCode (cname = \"xcb_%s_t\")]\n".printf (Root.format_c_name ((root as Root).extension_xname, name));
 
             ret += inPrefix + "public class %s\n".printf (Root.format_vala_name (name));
             ret += inPrefix + "{\n";
-            foreach (unowned XmlObject child in childs)
+            foreach (unowned XmlObject child in childs_unsorted)
             {
-                message ("child %s", child.tag_name);
                 ret += child.to_string (inPrefix + "\t");
             }
             ret += inPrefix + "}\n";
