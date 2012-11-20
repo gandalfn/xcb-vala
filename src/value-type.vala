@@ -29,12 +29,13 @@ namespace XCBVala
         // properties
         private string m_Name;
         private string m_Val;
+        private string m_ExtensionName;
 
         // static methods
         public static void
-        add (string inName, string inVal)
+        add (string inName, string inVal, string? inExtensionName)
         {
-            ValueType val = new ValueType (inName, inVal);
+            ValueType val = new ValueType (inName, inVal, inExtensionName);
             s_Types.insert (val);
         }
 
@@ -45,7 +46,28 @@ namespace XCBVala
                 return o.m_Name.ascii_casecmp (v);
             });
 
-            return val != null ? val.m_Val : null;
+            if (val != null)
+                return val.m_Val;
+
+            return null;
+        }
+
+        public static new string?
+        get_derived (string inName)
+        {
+            unowned ValueType? val = s_Types.search<string> (inName, (o, v) => {
+                return o.m_Name.ascii_casecmp (v);
+            });
+
+            if (val != null)
+            {
+                if (val.m_ExtensionName != null)
+                    return "Xcb." + Root.format_vala_name (val.m_ExtensionName) + "." + val.m_Val;
+                else
+                    return val.m_Val;
+            }
+
+            return null;
         }
 
         // methods
@@ -54,10 +76,11 @@ namespace XCBVala
             s_Types = new Set<ValueType> (ValueType.compare);
         }
 
-        private ValueType (string inName, string inVal)
+        private ValueType (string inName, string inVal, string? inExtensionName)
         {
             m_Name = inName;
             m_Val = inVal;
+            m_ExtensionName = inExtensionName;
         }
 
         private int

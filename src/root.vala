@@ -45,6 +45,7 @@ namespace XCBVala
         public int    pos             { get; set; default = 0; }
         public string characters      { get; set; default = null; }
 
+        public string path            { get; set; default = null; }
         public string header          { get; set; default = null; }
         public string extension_name  { get; set; default = null; }
         public string extension_xname { get; set; default = null; }
@@ -194,24 +195,44 @@ namespace XCBVala
         {
             m_Childs = new Set<XmlObject> (XmlObject.compare);
 
-            ValueType.add ("INT8", "int8");
-            ValueType.add ("INT16", "int16");
-            ValueType.add ("INT32", "int32");
-            ValueType.add ("CARD8", "uint8");
-            ValueType.add ("CARD16", "uint16");
-            ValueType.add ("CARD32", "uint32");
-            ValueType.add ("BYTE", "uint8");
-            ValueType.add ("BOOL", "bool");
-            ValueType.add ("char", "char");
+            ValueType.add ("INT8",   "int8",   extension_name);
+            ValueType.add ("INT16",  "int16",  extension_name);
+            ValueType.add ("INT32",  "int32",  extension_name);
+            ValueType.add ("CARD8",  "uint8",  extension_name);
+            ValueType.add ("CARD16", "uint16", extension_name);
+            ValueType.add ("CARD32", "uint32", extension_name);
+            ValueType.add ("BYTE",   "uint8",  extension_name);
+            ValueType.add ("BOOL",   "bool",   extension_name);
+            ValueType.add ("char",   "char",   extension_name);
         }
 
-        public void
-        on_child_added (XmlObject inChild)
+        private void
+        update_imports ()
         {
+            if (path != null)
+            {
+                GLib.List<unowned Import> imports = find_childs_of_type<unowned Import> ();
+                foreach (unowned Import import in imports)
+                {
+                    string filename = path + "/" + import.characters + ".xml";
+                    if (GLib.FileUtils.test (filename, GLib.FileTest.EXISTS))
+                    {
+                        try
+                        {
+                            XmlParser parser = new XmlParser (filename);
+                            parser.parse ("xcb");
+                        }
+                        catch (GLib.Error e)
+                        {
+                            warning ("%s", e.message);
+                        }
+                    }
+                }
+            }
         }
 
-        public void
-        on_end ()
+        private void
+        update_field_types ()
         {
             GLib.List<unowned Field> fields = find_childs_of_type<unowned Field> ();
             GLib.List<unowned Enum> enums = find_childs_of_type<unowned Enum> ();
@@ -242,7 +263,11 @@ namespace XCBVala
                     }
                 }
             }
+        }
 
+        private void
+        update_events ()
+        {
             GLib.List<unowned EventCopy> event_copys = find_childs_of_type<unowned EventCopy> ();
             GLib.List<unowned Event> events = find_childs_of_type<unowned Event> ();
             foreach (unowned EventCopy event_copy in event_copys)
@@ -263,19 +288,37 @@ namespace XCBVala
             }
 
             events = find_childs_of_type<unowned Event> ();
-            events.sort (Event.compare_number);
-
-            Enum event_enum = new Enum ();
-            event_enum.name = "EventType";
-            append_child (event_enum);
-
-            foreach (unowned Event event in events)
+            if (events.length () > 0)
             {
-                Item item = new Item ();
-                item.name = event.name;
+                events.sort (Event.compare_number);
 
-                event_enum.append_child (item);
+                Enum event_enum = new Enum ();
+                event_enum.name = "EventType";
+                append_child (event_enum);
+
+                foreach (unowned Event event in events)
+                {
+                    Item item = new Item ();
+                    item.name = event.name;
+
+                    event_enum.append_child (item);
+                }
             }
+        }
+
+        public void
+        on_child_added (XmlObject inChild)
+        {
+        }
+
+        public void
+        on_end ()
+        {
+            update_imports ();
+
+            update_field_types ();
+
+            update_events ();
         }
 
         public string
@@ -293,10 +336,13 @@ namespace XCBVala
 
             ret += inPrefix + "{\n";
 
+            bool nl = false;
             foreach (unowned XmlObject child in childs_unsorted)
             {
-                ret += child.to_string (inPrefix + "\t");
-                ret += "\n";
+                if (nl) ret += "\n";
+                string str = child.to_string (inPrefix + "\t");
+                nl = str.length != 0;
+                ret += str;
             }
             ret += inPrefix + "}\n";
 

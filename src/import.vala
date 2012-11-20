@@ -1,4 +1,4 @@
-/* typedef.vala
+/* import.vala
  *
  * Copyright (C) 2012  Nicolas Bruguier
  *
@@ -21,15 +21,18 @@
 
 namespace XCBVala
 {
-    public class Typedef : GLib.Object, XmlObject
+    public class Import : GLib.Object, XmlObject
     {
+        // static properties
+        private static ulong s_Count = 0;
+
         // properties
         private Set<XmlObject> m_Childs;
 
         // accessors
         protected string tag_name {
             get {
-                return "typedef";
+                return "import";
             }
         }
 
@@ -41,48 +44,32 @@ namespace XCBVala
             }
         }
 
-        public string name {
-            get {
-                return newname;
-            }
-            set {
-                newname = value;
-            }
-        }
-
+        public string name           { get; set; default = null; }
         public int    pos            { get; set; default = 0; }
         public string characters     { get; set; default = null; }
-        public string newname        { get; set; default = null; }
-        public string oldname        { get; set; default = null; }
 
         // methods
         construct
         {
             m_Childs = new Set<XmlObject> (XmlObject.compare);
+            s_Count++;
+            name = "import-%lu".printf (s_Count);
         }
 
         public void
         on_child_added (XmlObject inChild)
         {
-            message ("Add %s", inChild.tag_name);
         }
 
         public void
         on_end ()
         {
-            ValueType.add (newname, Root.format_vala_name (newname), (root as Root).extension_name);
         }
 
         public string
         to_string (string inPrefix)
         {
-            string ret = inPrefix + "[SimpleType, CCode (cname = \"xcb_%s_t\")]\n".printf (Root.format_c_name ((root as Root).extension_xname, newname));
-
-            ret += inPrefix + "public struct %s : %s\n".printf (Root.format_vala_name (name), ValueType.get (oldname));
-            ret += inPrefix + "{\n";
-            ret += inPrefix + "}\n";
-
-            return ret;
+            return "";
         }
     }
 }

@@ -9,6 +9,7 @@ xcb_vala_parser_SOURCES = \
     xml-parser.vala \
     xml-object.vala \
     value-type.vala \
+    import.vala \
     root.vala \
     class.vala \
     event.vala \

@@ -65,9 +65,14 @@ namespace XCBVala
             {
                 m_HaveTypeSuffix = true;
             }
+            else if (Root.format_vala_name (name) == "Connection")
+            {
+                m_HaveTypeSuffix = true;
+                ValueType.add (name, Root.format_vala_name (name) + "Type", (root as Root).extension_name);
+            }
             else
             {
-                ValueType.add (name, Root.format_vala_name (name));
+                ValueType.add (name, Root.format_vala_name (name), (root as Root).extension_name);
             }
         }
 

@@ -62,7 +62,7 @@ namespace XCBVala
         public void
         on_end ()
         {
-            ValueType.add (name, Root.format_vala_name (name));
+            ValueType.add (name, Root.format_vala_name (name), (root as Root).extension_name);
 
             GLib.List<unowned XIDType> xidtypes = root.find_childs_of_type<XIDType> ();
 
@@ -74,7 +74,7 @@ namespace XCBVala
                     {
                         if (xidtype.name == child.characters)
                         {
-                            xidtype.base_type = Root.format_vala_name (name);
+                            xidtype.base_type = name;
                         }
                     }
                 }

@@ -23,35 +23,36 @@ namespace XCBVala
 {
     public class XmlParser : Parser
     {
-        // Constants
+        // constants
         internal const string CDATA_PREFIX = "<![CDATA[";
         internal const string CDATA_SUFFIX = "]]>";
 
-        // Properties
+        // properties
         private string          m_Filename = null;
         private GLib.MappedFile m_File;
         private bool            m_EmptyElement = false;
 
-        // Static methods
+        // static methods
         static construct
         {
-            XmlObject.register_object ("xcb", typeof (Root));
-            XmlObject.register_object ("struct", typeof (Class));
-            XmlObject.register_object ("field", typeof (Field));
-            XmlObject.register_object ("typedef", typeof (Typedef));
-            XmlObject.register_object ("xidtype", typeof (XIDType));
-            XmlObject.register_object ("xidunion", typeof (XIDUnion));
-            XmlObject.register_object ("enum", typeof (Enum));
-            XmlObject.register_object ("item", typeof (Item));
-            XmlObject.register_object ("event", typeof (Event));
+            XmlObject.register_object ("import",  typeof (Import));
+            XmlObject.register_object ("xcb",       typeof (Root));
+            XmlObject.register_object ("struct",    typeof (Class));
+            XmlObject.register_object ("field",     typeof (Field));
+            XmlObject.register_object ("typedef",   typeof (Typedef));
+            XmlObject.register_object ("xidtype",   typeof (XIDType));
+            XmlObject.register_object ("xidunion",  typeof (XIDUnion));
+            XmlObject.register_object ("enum",      typeof (Enum));
+            XmlObject.register_object ("item",      typeof (Item));
+            XmlObject.register_object ("event",     typeof (Event));
             XmlObject.register_object ("eventcopy", typeof (EventCopy));
-            XmlObject.register_object ("union", typeof (Union));
-            XmlObject.register_object ("list", typeof (List));
-            XmlObject.register_object ("value", typeof (ValueItem));
-            XmlObject.register_object ("fieldref", typeof (FieldRef));
+            XmlObject.register_object ("union",     typeof (Union));
+            XmlObject.register_object ("list",      typeof (List));
+            XmlObject.register_object ("value",     typeof (ValueItem));
+            XmlObject.register_object ("fieldref",  typeof (FieldRef));
         }
 
-        // Methods
+        // methods
         /**
          * Create a new xml parser from a filename
          *
@@ -380,6 +381,8 @@ namespace XCBVala
                             object = XmlObject.create (element, attributes);
                             if (object != null)
                             {
+                                if (m_Filename != null)
+                                    object.set_attribute ("path", GLib.Path.get_dirname (m_Filename));
                                 object.parse (this);
                             }
                             else
