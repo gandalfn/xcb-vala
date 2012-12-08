@@ -52,6 +52,20 @@ namespace XCBVala
             m_Childs = new Set<XmlObject> (XmlObject.compare);
         }
 
+        private bool
+        have_create_request ()
+        {
+            foreach (unowned XmlObject child in childs)
+            {
+                if (child is Request && ((Request)child).function_name == "create")
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public void
         on_child_added (XmlObject inChild)
         {
@@ -66,11 +80,27 @@ namespace XCBVala
         public string
         to_string (string inPrefix)
         {
-            string ret = inPrefix + "[CCode (cname = \"xcb_%s_t\")]\n".printf (Root.format_c_name ((root as Root).extension_xname, name));
+            string ret = inPrefix + "[CCode (cname = \"xcb_%s_t\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
             string derived_type = ValueType.get_derived (base_type);
-            ret += inPrefix + "public struct %s : %s\n".printf (Root.format_vala_name (name), derived_type != null ? derived_type : "uint32");
-            ret += inPrefix + "{\n";
+            ret += inPrefix + "public struct %s : %s {\n".printf (Root.format_vala_name (name), derived_type != null ? derived_type : "uint32");
+            if (have_create_request ())
+            {
+                ret += inPrefix + "\t[CCode (cname = \"xcb_generate_id\")];\n";
+                ret += inPrefix + "\tpublic %s (Connection connection);\n\n".printf (Root.format_vala_name (name));
+            }
+            foreach (unowned XmlObject child in childs_unsorted)
+            {
+                ret += child.to_string (inPrefix + "\t");
+            }
             ret += inPrefix + "}\n";
+
+            foreach (unowned XmlObject child in childs_unsorted)
+            {
+                if (child is Request && (child as Request).reply != null)
+                {
+                    ret += "\n" + (child as Request).reply.to_string (inPrefix);
+                }
+            }
 
             return ret;
         }

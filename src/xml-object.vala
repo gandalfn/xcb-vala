@@ -332,6 +332,28 @@ namespace XCBVala
         }
 
         /**
+         * Reparent a child item to Object
+         *
+         * @param inObject child object to add
+         */
+        public void
+        reparent (XmlObject inChild)
+        {
+            if (!(inChild in childs))
+            {
+                inChild.ref ();
+                if (inChild.parent != null)
+                    inChild.parent.remove_child (inChild);
+                childs.insert (inChild);
+                inChild.unref ();
+
+                inChild.pos = childs.length - 1;
+                inChild.parent = this;
+                on_child_added (inChild);
+            }
+        }
+
+        /**
          * Remove a child item to Object
          *
          * @param inObject child object to remove
@@ -403,7 +425,7 @@ namespace XCBVala
 
             if (childs != null)
             {
-                foreach (unowned XmlObject? item in childs)
+                foreach (unowned XmlObject? item in childs_unsorted)
                 {
                     if (item.get_type ().is_a (typeof (T)))
                     {

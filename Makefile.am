@@ -1,5 +1,4 @@
-SUBDIRS = \
-    src
+SUBDIRS = src vapi
 
 xcbvaladocdir = ${prefix}/doc/xcb-vala
 xcbvaladoc_DATA = \

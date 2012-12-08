@@ -68,7 +68,7 @@ namespace XCBVala
             string ret = inPrefix + Root.format_vala_enum_name (name, out is_numeric);
             if (is_numeric && parent is Enum)
             {
-                ret = inPrefix + "[CCode (cname = \"XCB_%s_%s\")]\n".printf (Root.format_c_enum_name ((root as Root).extension_xname, parent.name), Root.format_c_enum_name ((root as Root).extension_xname, name)) + ret;
+                ret = inPrefix + "[CCode (cname = \"XCB_%s_%s\")]\n".printf (Root.format_c_enum_name ((root as Root).extension_xname, parent.name), Root.format_c_enum_name ((root as Root).extension_name, name)) + ret;
             }
             return ret;
         }

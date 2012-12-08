@@ -25,6 +25,7 @@ namespace XCBVala
     {
         // properties
         private Set<XmlObject> m_Childs;
+        private Connection     m_Connection = null;
 
         // accessors
         protected string tag_name {
@@ -139,6 +140,15 @@ namespace XCBVala
         }
 
         public static string
+        format_c_extension_name (string inExtensionName)
+        {
+            if (inExtensionName.down () == "randr")
+                return "randr";
+
+            return format_c_name (null, inExtensionName);
+        }
+
+        public static string
         format_c_name (string? inExtensionName, string inName)
         {
             GLib.StringBuilder ret = new GLib.StringBuilder("");
@@ -161,7 +171,7 @@ namespace XCBVala
                 }
             }
 
-            return inExtensionName != null ? format_c_name (null, inExtensionName) + "_" + ret.str : ret.str;
+            return inExtensionName != null ? format_c_extension_name (inExtensionName) + "_" + ret.str : ret.str;
         }
 
         public static string
@@ -204,6 +214,7 @@ namespace XCBVala
             ValueType.add ("BYTE",   "uint8",  extension_name);
             ValueType.add ("BOOL",   "bool",   extension_name);
             ValueType.add ("char",   "char",   extension_name);
+            ValueType.add ("void",   "void",   extension_name);
         }
 
         private void
@@ -306,6 +317,52 @@ namespace XCBVala
             }
         }
 
+        private void
+        update_errors ()
+        {
+            GLib.List<unowned ErrorCopy> error_copys = find_childs_of_type<unowned ErrorCopy> ();
+            GLib.List<unowned Error> errors = find_childs_of_type<unowned Error> ();
+            foreach (unowned ErrorCopy error_copy in error_copys)
+            {
+                if (error_copy.@ref != null)
+                {
+                    foreach (unowned Error error in errors)
+                    {
+                        if (error.name == error_copy.@ref)
+                        {
+                            Error copy = error.copy (error_copy.name, error_copy.number);
+                            remove_child (error_copy);
+                            append_child (copy);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        public void
+        update_requests ()
+        {
+            GLib.List<unowned Request> requests = find_childs_of_type<unowned Request> ();
+            foreach (unowned Request request in requests)
+            {
+                if (request.owner != null)
+                {
+                    request.owner.reparent (request);
+                }
+                else
+                {
+                    if (m_Connection == null)
+                    {
+                        m_Connection = new Connection ();
+                        append_child (m_Connection);
+                        m_Connection.pos = -100;
+                    }
+                    m_Connection.reparent (request);
+                }
+            }
+        }
+
         public void
         on_child_added (XmlObject inChild)
         {
@@ -319,12 +376,42 @@ namespace XCBVala
             update_field_types ();
 
             update_events ();
+
+            update_errors ();
+
+            update_requests ();
         }
 
         public string
         to_string (string inPrefix)
         {
-            string ret = "";
+            string ret = inPrefix + "/*\n" +
+                         inPrefix + " * Copyright (C) 2012  Nicolas Bruguier\n" +
+                         inPrefix + " *\n" +
+                         inPrefix + " * This library is free software: you can redistribute it and/or modify\n" +
+                         inPrefix + " * it under the terms of the GNU Lesser General Public License as published by\n" +
+                         inPrefix + " * the Free Software Foundation, either version 3 of the License, or\n" +
+                         inPrefix + " * (at your option) any later version.\n" +
+                         inPrefix + " *\n" +
+                         inPrefix + " * This library is distributed in the hope that it will be useful,\n" +
+                         inPrefix + " * but WITHOUT ANY WARRANTY; without even the implied warranty of\n" +
+                         inPrefix + " * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n" +
+                         inPrefix + " * GNU Lesser General Public License for more details.\n" +
+                         inPrefix + " *\n" +
+                         inPrefix + " * You should have received a copy of the GNU Lesser General Public License\n" +
+                         inPrefix + " * along with this library.  If not, see <http://www.gnu.org/licenses/>.\n" +
+                         inPrefix + " *\n" +
+                         inPrefix + " * Author:\n" +
+                         inPrefix + " *  Nicolas Bruguier <gandalfn@club-internet.fr>\n" +
+                         inPrefix + " */\n\n";
+
+            ret += inPrefix + "using Xcb;\n";
+            GLib.List<unowned Import> imports = find_childs_of_type<unowned Import> ();
+            foreach (unowned Import import in imports)
+            {
+                ret += inPrefix + import.to_string (inPrefix);
+            }
+            ret += "\n";
 
             if (header != null)
                 ret += inPrefix + "[CCode (cheader_filename=\"xcb/%s.h\")]\n".printf (header);
@@ -339,10 +426,13 @@ namespace XCBVala
             bool nl = false;
             foreach (unowned XmlObject child in childs_unsorted)
             {
-                if (nl) ret += "\n";
-                string str = child.to_string (inPrefix + "\t");
-                nl = str.length != 0;
-                ret += str;
+                if (!(child is Import))
+                {
+                    if (nl) ret += "\n";
+                    string str = child.to_string (inPrefix + "\t");
+                    nl = str.length != 0;
+                    ret += str;
+                }
             }
             ret += inPrefix + "}\n";
 

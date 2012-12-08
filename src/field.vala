@@ -63,10 +63,15 @@ namespace XCBVala
         public string
         to_string (string inPrefix)
         {
-            if (!is_ref)
+            if (!is_ref && parent != null)
             {
                 if (attrtype != null && ValueType.get (attrtype) != null)
-                    return inPrefix + "public %s %s;\n".printf (ValueType.get (attrtype), name);
+                {
+                    if (parent is Request)
+                        return inPrefix + "%s %s".printf (ValueType.get (attrtype), name);
+                    else
+                        return inPrefix + "public %s %s;\n".printf (ValueType.get (attrtype), name);
+                }
                 else
                     warning ("Type %s of %s not found", attrtype, name);
             }

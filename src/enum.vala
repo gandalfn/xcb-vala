@@ -82,14 +82,13 @@ namespace XCBVala
             string ret = "";
 
             if (name == "EventType")
-                ret += inPrefix + "[CCode (cname = \"uint8\", cprefix =  \"XCB_%s_\")]\n".printf (Root.format_c_enum_name ((root as Root).extension_xname, "Event"));
+                ret += inPrefix + "[CCode (cname = \"uint8\", cprefix =  \"XCB_%s_\")]\n".printf (Root.format_c_enum_name ((root as Root).extension_name, "Event"));
             else if (!is_mask)
-                ret += inPrefix + "[CCode (cname = \"xcb_%s_t\", cprefix =  \"XCB_%s_\")]\n".printf (Root.format_c_name ((root as Root).extension_xname, name), Root.format_c_enum_name ((root as Root).extension_xname, name));
+                ret += inPrefix + "[CCode (cname = \"xcb_%s_t\", cprefix =  \"XCB_%s_\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name), Root.format_c_enum_name ((root as Root).extension_name, name));
             else
-                ret += inPrefix + "[Flags, CCode (cname = \"xcb_%s_t\", cprefix =  \"XCB_%s_\")]\n".printf (Root.format_c_name ((root as Root).extension_xname, name), Root.format_c_enum_name ((root as Root).extension_xname, name));
+                ret += inPrefix + "[Flags, CCode (cname = \"xcb_%s_t\", cprefix =  \"XCB_%s_\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name), Root.format_c_enum_name ((root as Root).extension_name, name));
 
-            ret += inPrefix + "public enum %s%s\n".printf (Root.format_vala_name (name), m_HaveTypeSuffix ? "Type" : "");
-            ret += inPrefix + "{\n";
+            ret += inPrefix + "public enum %s%s {\n".printf (Root.format_vala_name (name), m_HaveTypeSuffix ? "Type" : "");
             int length = childs.length;
             int cpt = 0;
             foreach (unowned XmlObject child in childs_unsorted)

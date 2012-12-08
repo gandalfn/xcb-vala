@@ -1,4 +1,4 @@
-/* import.vala
+/* reply.vala
  *
  * Copyright (C) 2012  Nicolas Bruguier
  *
@@ -21,7 +21,7 @@
 
 namespace XCBVala
 {
-    public class Import : GLib.Object, XmlObject
+    public class Reply : GLib.Object, XmlObject
     {
         // static properties
         private static ulong s_Count = 0;
@@ -32,7 +32,7 @@ namespace XCBVala
         // accessors
         protected string tag_name {
             get {
-                return "import";
+                return "reply";
             }
         }
 
@@ -53,7 +53,7 @@ namespace XCBVala
         {
             m_Childs = new Set<XmlObject> (XmlObject.compare);
             s_Count++;
-            name = "import-%lu".printf (s_Count);
+            name = "reply-%lu".printf (s_Count);
         }
 
         public void
@@ -69,10 +69,23 @@ namespace XCBVala
         public string
         to_string (string inPrefix)
         {
-            if (characters == "xproto")
-                return "";
+            string ret;
 
-            return "using Xcb.%s;\n".printf (Root.format_vala_name (characters));
+            ret = inPrefix + "[Compact, CCode (cname = \"xcb_%s_reply_t\", free_function = \"free\")]\n".printf (Root.format_c_name ((root as Root).extension_name, parent.name));
+
+            ret += inPrefix + "public class %sReply {\n".printf (Root.format_vala_name (parent.name));
+            foreach (unowned XmlObject child in childs_unsorted)
+            {
+                ret += child.to_string (inPrefix + "\t");
+            }
+            ret += inPrefix + "}\n\n";
+            ret += inPrefix + "[SimpleType, CCode (cname = \"xcb_%s_cookie_t\")]\n".printf (Root.format_c_name ((root as Root).extension_name, parent.name));
+            ret += inPrefix + "public struct %sCookie : VoidCookie {\n".printf (Root.format_vala_name (parent.name));
+            ret += inPrefix + "\t[CCode (cname = \"xcb_%s_reply\", instance_pos = 1.1)]\n".printf (Root.format_c_name ((root as Root).extension_name, parent.name));
+            ret += inPrefix + "\tpublic %sReply reply (Connection connection, out GenericError? error = null);\n".printf (Root.format_vala_name (parent.name));
+            ret += inPrefix + "}\n";
+
+            return ret;
         }
     }
 }

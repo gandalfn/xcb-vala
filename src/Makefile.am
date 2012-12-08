@@ -11,9 +11,13 @@ xcb_vala_parser_SOURCES = \
     value-type.vala \
     import.vala \
     root.vala \
+    request.vala \
+    reply.vala \
     class.vala \
     event.vala \
     event-copy.vala \
+    error.vala \
+    error-copy.vala \
     enum.vala \
     item.vala \
     field.vala \
@@ -25,6 +29,7 @@ xcb_vala_parser_SOURCES = \
     xid-type.vala \
     xid-union.vala \
     xid-union-type.vala \
+    connection.vala \
     xcb-vala-parser.vala
 
 xcb_vala_parser_LDADD = \

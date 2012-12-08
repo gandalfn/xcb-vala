@@ -42,7 +42,17 @@ namespace XCBVala
         public static new string?
         @get (string inName)
         {
-            unowned ValueType? val = s_Types.search<string> (inName, (o, v) => {
+            string name;
+            if (":" in inName)
+            {
+                name = inName.split (":")[1];
+            }
+            else
+            {
+                name = inName;
+            }
+
+            unowned ValueType? val = s_Types.search<string> (name, (o, v) => {
                 return o.m_Name.ascii_casecmp (v);
             });
 

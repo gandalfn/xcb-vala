@@ -86,23 +86,50 @@ namespace XCBVala
             {
                 if (field_ref != null)
                 {
-                    ret += inPrefix + "[CCode (array_length_cname = \"%s\")]\n".printf (field_ref);
-                    ret += inPrefix + "public %s[] %s;\n".printf (ValueType.get (attrtype), name);
+                    if (parent is Request)
+                    {
+                        ret += inPrefix + "%s[] %s".printf (ValueType.get (attrtype), name);
+                    }
+                    else
+                    {
+                        ret += inPrefix + "[CCode (array_length_cname = \"%s\")]\n".printf (field_ref);
+                        ret += inPrefix + "public %s[] %s;\n".printf (ValueType.get (attrtype), name);
+                    }
                 }
                 else if (childs.length == 1)
                 {
-                    ret += inPrefix + "public %s %s".printf (ValueType.get (attrtype), name);
-                    foreach (unowned XmlObject child in childs_unsorted)
+                    if (parent is Request)
                     {
-                        if (child is ValueItem)
-                            ret += "[%i]".printf (int.parse (child.characters));
+                        ret += inPrefix + "%s %s".printf (ValueType.get (attrtype), name);
+                        foreach (unowned XmlObject child in childs_unsorted)
+                        {
+                            if (child is ValueItem)
+                                ret += "[%i]".printf (int.parse (child.characters));
+                        }
                     }
-                    ret += ";\n";
+                    else
+                    {
+                        ret += inPrefix + "public %s %s".printf (ValueType.get (attrtype), name);
+                        foreach (unowned XmlObject child in childs_unsorted)
+                        {
+                            if (child is ValueItem)
+                                ret += "[%i]".printf (int.parse (child.characters));
+                        }
+                        ret += ";\n";
+                    }
                 }
                 else
                 {
-                    ret += inPrefix + "[CCode (array_length = false)]\n";
-                    ret += inPrefix + "public %s[] %s;\n".printf (ValueType.get (attrtype), name);
+                    if (parent is Request)
+                    {
+                        ret += inPrefix + "[CCode (array_length = false)]";
+                        ret += "%s[] %s".printf (ValueType.get (attrtype), name);
+                    }
+                    else
+                    {
+                        ret += inPrefix + "[CCode (array_length = false)]\n";
+                        ret += inPrefix + "public %s[] %s;\n".printf (ValueType.get (attrtype), name);
+                    }
                 }
             }
             else

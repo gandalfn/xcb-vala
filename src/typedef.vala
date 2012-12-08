@@ -76,10 +76,9 @@ namespace XCBVala
         public string
         to_string (string inPrefix)
         {
-            string ret = inPrefix + "[SimpleType, CCode (cname = \"xcb_%s_t\")]\n".printf (Root.format_c_name ((root as Root).extension_xname, newname));
+            string ret = inPrefix + "[SimpleType, CCode (cname = \"xcb_%s_t\")]\n".printf (Root.format_c_name ((root as Root).extension_name, newname));
 
-            ret += inPrefix + "public struct %s : %s\n".printf (Root.format_vala_name (name), ValueType.get (oldname));
-            ret += inPrefix + "{\n";
+            ret += inPrefix + "public struct %s : %s {\n".printf (Root.format_vala_name (name), ValueType.get (oldname));
             ret += inPrefix + "}\n";
 
             return ret;

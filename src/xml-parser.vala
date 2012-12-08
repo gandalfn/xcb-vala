@@ -35,7 +35,7 @@ namespace XCBVala
         // static methods
         static construct
         {
-            XmlObject.register_object ("import",  typeof (Import));
+            XmlObject.register_object ("import",    typeof (Import));
             XmlObject.register_object ("xcb",       typeof (Root));
             XmlObject.register_object ("struct",    typeof (Class));
             XmlObject.register_object ("field",     typeof (Field));
@@ -46,10 +46,14 @@ namespace XCBVala
             XmlObject.register_object ("item",      typeof (Item));
             XmlObject.register_object ("event",     typeof (Event));
             XmlObject.register_object ("eventcopy", typeof (EventCopy));
+            XmlObject.register_object ("error",     typeof (Error));
+            XmlObject.register_object ("errorcopy", typeof (ErrorCopy));
             XmlObject.register_object ("union",     typeof (Union));
             XmlObject.register_object ("list",      typeof (List));
             XmlObject.register_object ("value",     typeof (ValueItem));
             XmlObject.register_object ("fieldref",  typeof (FieldRef));
+            XmlObject.register_object ("request",   typeof (Request));
+            XmlObject.register_object ("reply",     typeof (Reply));
         }
 
         // methods
@@ -88,6 +92,23 @@ namespace XCBVala
             char* end = begin + inLength;
 
             base (begin, end);
+        }
+
+        private bool
+        check_end_chars (char[] inEndChars)
+        {
+            bool ret = false;
+
+            foreach (char c in inEndChars)
+            {
+                if (c == m_pCurrent[0])
+                {
+                    ret = true;
+                    break;
+                }
+            }
+
+            return ret;
         }
 
         private void
@@ -163,13 +184,13 @@ namespace XCBVala
 
                 m_pCurrent++;
                 skip_space ();
-                if (m_pCurrent >= m_pEnd || m_pCurrent[0] != '"')
+                if (m_pCurrent >= m_pEnd || (m_pCurrent[0] != '"' && m_pCurrent[0] != '\''))
                     throw new ParseError.PARSE ("%lu Unexpected end of element %s", m_pCurrent - m_pBegin, m_Element);
 
                 m_pCurrent++;
-                string val = text ('"', false);
+                string val = text ({ '"', '\'' }, false);
 
-                if (m_pCurrent >= m_pEnd || m_pCurrent[0] != '"')
+                if (m_pCurrent >= m_pEnd || (m_pCurrent[0] != '"' && m_pCurrent[0] != '\''))
                     throw new ParseError.PARSE ("%lu Unexpected end of element %s", m_pCurrent - m_pBegin, m_Element);
 
                 m_pCurrent++;
@@ -180,14 +201,14 @@ namespace XCBVala
         }
 
         private string
-        text (char inEndChar, bool inRmTrailingWhitespace) throws ParseError
+        text (char[] inEndChars, bool inRmTrailingWhitespace) throws ParseError
         {
             GLib.StringBuilder content = new GLib.StringBuilder ();
             char* text_begin = m_pCurrent;
             char* last_linebreak = m_pCurrent;
             bool inCDATA = ((string)m_pCurrent).has_prefix (CDATA_PREFIX);
 
-            while (m_pCurrent < m_pEnd && (inCDATA || m_pCurrent[0] != inEndChar))
+            while (m_pCurrent < m_pEnd && (inCDATA || !check_end_chars (inEndChars)))
             {
                 if (((string)m_pCurrent).has_prefix (CDATA_PREFIX))
                 {
@@ -345,7 +366,7 @@ namespace XCBVala
 
                 if (m_pCurrent[0] != '<' || ((string)m_pCurrent).has_prefix (CDATA_PREFIX))
                 {
-                    m_Characters = text ('<', true);
+                    m_Characters = text ({'<'}, true);
                 }
                 else
                 {

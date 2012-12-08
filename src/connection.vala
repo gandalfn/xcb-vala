@@ -1,4 +1,4 @@
-/* import.vala
+/* connection.vala
  *
  * Copyright (C) 2012  Nicolas Bruguier
  *
@@ -21,18 +21,15 @@
 
 namespace XCBVala
 {
-    public class Import : GLib.Object, XmlObject
+    public class Connection : GLib.Object, XmlObject
     {
-        // static properties
-        private static ulong s_Count = 0;
-
         // properties
         private Set<XmlObject> m_Childs;
 
         // accessors
         protected string tag_name {
             get {
-                return "import";
+                return "";
             }
         }
 
@@ -44,16 +41,14 @@ namespace XCBVala
             }
         }
 
-        public string name           { get; set; default = null; }
-        public int    pos            { get; set; default = 0; }
+        public string name           { get; set; default = "Connection"; }
+        public int    pos            { get; set; default = -1; }
         public string characters     { get; set; default = null; }
 
         // methods
         construct
         {
             m_Childs = new Set<XmlObject> (XmlObject.compare);
-            s_Count++;
-            name = "import-%lu".printf (s_Count);
         }
 
         public void
@@ -69,10 +64,27 @@ namespace XCBVala
         public string
         to_string (string inPrefix)
         {
-            if (characters == "xproto")
-                return "";
+            string ret = inPrefix + "[Compact, CCode (cname = \"xcb_connection_t\")]\n";
 
-            return "using Xcb.%s;\n".printf (Root.format_vala_name (characters));
+            ret += inPrefix + "public class Connection : Xcb.Connection {\n";
+
+            bool first = true;
+            foreach (unowned XmlObject child in childs_unsorted)
+            {
+                if (!first) ret += "\n";
+                ret += child.to_string (inPrefix + "\t");
+            }
+            ret += inPrefix + "}\n";
+
+            foreach (unowned XmlObject child in childs_unsorted)
+            {
+                if (child is Request && (child as Request).reply != null)
+                {
+                    ret += "\n" + (child as Request).reply.to_string (inPrefix);
+                }
+            }
+
+            return ret;
         }
     }
 }
