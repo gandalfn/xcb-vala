@@ -52,6 +52,19 @@ namespace XCBVala
         {
             m_Childs = new Set<XmlObject> (XmlObject.compare);
         }
+        private bool
+        have_create_request ()
+        {
+            foreach (unowned XmlObject child in childs)
+            {
+                if (child is Request && ((Request)child).function_name == "create")
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         public XIDType
         copy (Root inRoot)
@@ -95,8 +108,11 @@ namespace XCBVala
             }
             string derived_type = ValueType.get_derived (base_type);
             ret += inPrefix + "public struct %s : %s {\n".printf (Root.format_vala_name (name), derived_type != null ? derived_type : "uint32");
-            ret += inPrefix + "\t[CCode (cname = \"xcb_generate_id\")]\n";
-            ret += inPrefix + "\tpublic %s (Connection connection);\n\n".printf (Root.format_vala_name (name));
+            if (have_create_request () || Root.format_vala_name (name) == "Gcontext")
+            {
+                ret += inPrefix + "\t[CCode (cname = \"xcb_generate_id\")]\n";
+                ret += inPrefix + "\tpublic %s (Connection connection);\n\n".printf (Root.format_vala_name (name));
+            }
 
             foreach (unowned XmlObject child in childs_unsorted)
             {
