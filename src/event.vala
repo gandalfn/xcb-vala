@@ -79,9 +79,9 @@ namespace XCBVala
         public string
         to_string (string inPrefix)
         {
-            string ret = inPrefix + "[Compact, CCode (cname = \"xcb_%s_t\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
+            string ret = inPrefix + "[Compact, CCode (cname = \"xcb_%s_event_t\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
 
-            ret += inPrefix + "public class %s : GenericEvent {\n".printf (Root.format_vala_name (name));
+            ret += inPrefix + "public class %sEvent : GenericEvent {\n".printf (Root.format_vala_name (name));
             foreach (unowned XmlObject child in childs_unsorted)
             {
                 ret += child.to_string (inPrefix + "\t");
