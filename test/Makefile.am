@@ -1,0 +1,36 @@
+include $(top_srcdir)/build/vala.am
+
+noinst_PROGRAMS = \
+	simple-window \
+	simple-drawing
+
+simple_window_VALAFLAGS = \
+	--vapidir=${top_srcdir}/vapi \
+	--pkg=xcb \
+	--pkg=posix
+
+simple_window_SOURCES = \
+	simple-window.vala
+
+simple_window_LDADD = \
+	$(XCB_VALA_LIBS)
+
+simple_drawing_VALAFLAGS = \
+	--vapidir=${top_srcdir}/vapi \
+	--pkg=xcb
+
+simple_drawing_SOURCES = \
+	simple-drawing.vala
+
+simple_drawing_LDADD = \
+	$(XCB_VALA_LIBS)
+
+VALAFILES = \
+    $(filter %.vala,$(simple_window_SOURCES)) \
+    $(filter %.vala,$(simple_drawing_SOURCES))
+
+CLEANFILES += \
+    simple_window_vala.stamp \
+    simple_drawing_vala.stamp \
+    $(VALAFILES:.vala=.c) \
+    $(VALAFILES:.vala=.h)

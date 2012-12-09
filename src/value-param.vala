@@ -1,4 +1,4 @@
-/* connection.vala
+/* value-param.vala
  *
  * Copyright (C) 2012  Nicolas Bruguier
  *
@@ -21,15 +21,18 @@
 
 namespace XCBVala
 {
-    public class Connection : GLib.Object, XmlObject
+    public class ValueParam : GLib.Object, XmlObject
     {
+        // static properties
+        private static ulong s_Count = 0;
+
         // properties
         private Set<XmlObject> m_Childs;
 
         // accessors
         protected string tag_name {
             get {
-                return "";
+                return "valueparam";
             }
         }
 
@@ -41,14 +44,19 @@ namespace XCBVala
             }
         }
 
-        public string name           { get; set; default = "Connection"; }
-        public int    pos            { get; set; default = -1; }
-        public string characters     { get; set; default = null; }
+        public string name            { get; set; default = null; }
+        public int    pos             { get; set; default = 0; }
+        public string characters      { get; set; default = null; }
+        public string value_mask_type { get; set; default = null; }
+        public string value_mask_name { get; set; default = null; }
+        public string value_list_name { get; set; default = null; }
 
         // methods
         construct
         {
             m_Childs = new Set<XmlObject> (XmlObject.compare);
+            s_Count++;
+            name = "value-param-%lu".printf (s_Count);
         }
 
         public void
@@ -64,32 +72,28 @@ namespace XCBVala
         public string
         to_string (string inPrefix)
         {
-            string ret = inPrefix + "[Compact, CCode (cname = \"xcb_connection_t\", free_function = \"xcb_disconnect\")]\n";
+            string ret = inPrefix;
+            bool found = false;
 
-            if ((root as Root).extension_name == null)
-                ret += inPrefix + "public class Connection : Xcb.BaseConnection {\n";
-            else
-                ret += inPrefix + "public class Connection : Xcb.Connection {\n";
-
-            ret += inPrefix + "\t[CCode (cname = \"xcb_connect\")]\n";
-            ret += inPrefix + "\tpublic Connection (string? displayname = null, out int screen = null);\n\n";
-
-            bool first = true;
-            foreach (unowned XmlObject child in childs_unsorted)
+            if (parent is Request)
             {
-                if (!first) ret += "\n";
-                ret += child.to_string (inPrefix + "\t");
-            }
-            ret += inPrefix + "}\n";
+                GLib.List<unowned Field> fields = parent.find_childs_of_type<Field> ();
 
-            foreach (unowned XmlObject child in childs_unsorted)
-            {
-                if (child is Request && (child as Request).reply != null)
+                foreach (unowned Field child in fields)
                 {
-                    ret += "\n" + (child as Request).reply.to_string (inPrefix);
+                    if (child.name == value_mask_name)
+                    {
+                        found = true;
+                        break;
+                    }
                 }
             }
+            if (!found)
+            {
+                ret += "%s %s = 0, ".printf (ValueType.get (value_mask_type), value_mask_name);
+            }
 
+            ret += "[CCode (array_length = false)]uint32[]? %s = null".printf (value_list_name);
             return ret;
         }
     }

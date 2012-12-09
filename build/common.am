@@ -5,7 +5,7 @@ INCLUDES = \
     $(XCB_VALA_CFLAGS)
 
 AM_CFLAGS = \
-     -w -O3
+    -w -flto -O3
 
 EXTRA_DIST =
 

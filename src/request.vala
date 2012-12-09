@@ -92,6 +92,37 @@ namespace XCBVala
             return ret;
         }
 
+        public bool
+        search_owner (XmlObject inRoot)
+        {
+            GLib.List<unowned XIDType> xid_types = inRoot.find_childs_of_type<XIDType> ();
+            GLib.List<unowned XIDUnion> xid_unions = inRoot.find_childs_of_type<XIDUnion> ();
+            GLib.List<unowned Field> fields = find_childs_of_type<Field> ();
+            foreach (unowned Field field in fields)
+            {
+                foreach (unowned XIDType xid_type in xid_types)
+                {
+                    if (ValueType.get (field.attrtype) == Root.format_vala_name (xid_type.name))
+                    {
+                        m_Owner = xid_type;
+                        m_OwnerPos = field.pos + 1;
+                        return true;
+                    }
+                }
+                foreach (unowned XIDUnion xid_union in xid_unions)
+                {
+                    if (ValueType.get (field.attrtype) == Root.format_vala_name (xid_union.name))
+                    {
+                        m_Owner = xid_union;
+                        m_OwnerPos = field.pos + 1;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
         public void
         on_child_added (XmlObject inChild)
         {
@@ -106,30 +137,7 @@ namespace XCBVala
         {
             if (root != null)
             {
-                GLib.List<unowned XIDType> xid_types = root.find_childs_of_type<XIDType> ();
-                GLib.List<unowned XIDUnion> xid_unions = root.find_childs_of_type<XIDUnion> ();
-                GLib.List<unowned Field> fields = find_childs_of_type<Field> ();
-                foreach (unowned Field field in fields)
-                {
-                    foreach (unowned XIDType xid_type in xid_types)
-                    {
-                        if (ValueType.get (field.attrtype) == Root.format_vala_name (xid_type.name))
-                        {
-                            m_Owner = xid_type;
-                            m_OwnerPos = field.pos + 1;
-                            return;
-                        }
-                    }
-                    foreach (unowned XIDUnion xid_union in xid_unions)
-                    {
-                        if (ValueType.get (field.attrtype) == Root.format_vala_name (xid_union.name))
-                        {
-                            m_Owner = xid_union;
-                            m_OwnerPos = field.pos + 1;
-                            return;
-                        }
-                    }
-                }
+                search_owner (root);
             }
         }
 

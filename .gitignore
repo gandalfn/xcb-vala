@@ -5,6 +5,12 @@ src/*.c
 src/*.h
 src/*.o
 src/*.stamp
+test/.deps
+test/*.c
+test/*.h
+test/*.o
+vapi/*.vapi
+vapi/*.deps
 *~
 build/*.h
 build/*.in

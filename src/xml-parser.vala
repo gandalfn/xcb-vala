@@ -51,6 +51,7 @@ namespace XCBVala
             XmlObject.register_object ("union",     typeof (Union));
             XmlObject.register_object ("list",      typeof (List));
             XmlObject.register_object ("value",     typeof (ValueItem));
+            XmlObject.register_object ("valueparam",typeof (ValueParam));
             XmlObject.register_object ("fieldref",  typeof (FieldRef));
             XmlObject.register_object ("request",   typeof (Request));
             XmlObject.register_object ("reply",     typeof (Reply));

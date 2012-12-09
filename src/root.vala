@@ -24,8 +24,9 @@ namespace XCBVala
     public class Root : GLib.Object, XmlObject
     {
         // properties
-        private Set<XmlObject> m_Childs;
-        private Connection     m_Connection = null;
+        private Set<XmlObject>       m_Childs;
+        private Connection           m_Connection = null;
+        private GLib.List<XmlObject> m_Imports = new GLib.List<XmlObject> ();
 
         // accessors
         protected string tag_name {
@@ -50,6 +51,23 @@ namespace XCBVala
         public string header          { get; set; default = null; }
         public string extension_name  { get; set; default = null; }
         public string extension_xname { get; set; default = null; }
+
+        public string[] deps {
+            owned get {
+                string[] depends = {};
+
+                foreach (unowned XmlObject import in m_Imports)
+                {
+                    if ((import as Root).extension_name != null)
+                        depends += "xcb-%s".printf ((import as Root).extension_name.down ());
+                    else
+                        depends += "xcb";
+
+                }
+
+                return depends;
+            }
+        }
 
         // static methods
         public static string
@@ -171,7 +189,7 @@ namespace XCBVala
                 }
             }
 
-            return inExtensionName != null ? format_c_extension_name (inExtensionName) + "_" + ret.str : ret.str;
+            return inExtensionName != null && inExtensionName != "proto" ? format_c_extension_name (inExtensionName) + "_" + ret.str : ret.str;
         }
 
         public static string
@@ -197,7 +215,7 @@ namespace XCBVala
                 }
             }
 
-            return inExtensionName != null ? format_c_enum_name (null, inExtensionName) + "_" + ret.str : ret.str;
+            return inExtensionName != null && inExtensionName != "proto" ? format_c_enum_name (null, inExtensionName) + "_" + ret.str : ret.str;
         }
 
         // methods
@@ -231,7 +249,9 @@ namespace XCBVala
                         try
                         {
                             XmlParser parser = new XmlParser (filename);
-                            parser.parse ("xcb");
+                            XmlObject import_root = parser.parse ("xcb");
+
+                            m_Imports.append (import_root);
                         }
                         catch (GLib.Error e)
                         {
@@ -352,13 +372,47 @@ namespace XCBVala
                 }
                 else
                 {
-                    if (m_Connection == null)
+                    foreach (unowned XmlObject import in m_Imports)
                     {
-                        m_Connection = new Connection ();
-                        append_child (m_Connection);
-                        m_Connection.pos = -100;
+                        if (request.search_owner (import))
+                        {
+                            unowned XmlObject? found = childs.search<string> (request.owner.name, (o, v) => {
+                                return GLib.strcmp (o.name, v);
+                            });
+
+                            if (found == null)
+                            {
+                                if (request.owner is XIDType)
+                                {
+                                    XIDType type = (request.owner as XIDType).copy (import as Root);
+                                    append_child (type);
+                                    type.on_end ();
+                                    type.pos = -100;
+                                }
+                                else if (request.owner is XIDUnion)
+                                {
+                                    XIDType type = (request.owner as XIDUnion).copy (import as Root);
+                                    append_child (type);
+                                    type.on_end ();
+                                    type.pos = -100;
+                                }
+                            }
+                            request.search_owner (this);
+                            request.owner.reparent (request);
+                            break;
+                        }
                     }
-                    m_Connection.reparent (request);
+
+                    if (request.owner == null)
+                    {
+                        if (m_Connection == null)
+                        {
+                            m_Connection = new Connection ();
+                            append_child (m_Connection);
+                            m_Connection.pos = -100;
+                        }
+                        m_Connection.reparent (request);
+                    }
                 }
             }
         }
@@ -414,7 +468,7 @@ namespace XCBVala
             ret += "\n";
 
             if (header != null)
-                ret += inPrefix + "[CCode (cheader_filename=\"xcb/%s.h\")]\n".printf (header);
+                ret += inPrefix + "[CCode (cheader_filename=\"xcb/xcb.h,xcb/%s.h\")]\n".printf (header);
 
             if (extension_name != null)
                 ret += inPrefix + "namespace Xcb.%s\n".printf (extension_name);

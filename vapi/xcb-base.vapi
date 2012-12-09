@@ -158,7 +158,7 @@ namespace Xcb
      * A class that contain all data that  XCB needs to communicate with an X server.
      */
     [Compact, CCode (cname = "xcb_connection_t", free_function = "xcb_disconnect")]
-    public class Connection
+    public class BaseConnection
     {
         [CCode (cname = "int")]
         public enum Status
@@ -277,7 +277,7 @@ namespace Xcb
          * @return A new Connection.
          */
         [CCode (cname = "xcb_connect")]
-        public Connection (string? displayname = null, out int screen = null);
+        public BaseConnection (string? displayname = null, out int screen = null);
 
         /**
          * Connects to the X server, using an authorization information.
@@ -294,7 +294,7 @@ namespace Xcb
          * @return A newly allocated xcb_connection_t structure.
          */
         [CCode (cname = "xcb_connect_to_display_with_auth_info")]
-        public Connection.with_auth_info (string? display, AuthInfo? auth, out int screen = null);
+        public BaseConnection.with_auth_info (string? display, AuthInfo? auth, out int screen = null);
 
         /**
          * Connects to the X server.
@@ -310,7 +310,7 @@ namespace Xcb
          * @return A new Connection.
          */
         [CCode (cname = "xcb_connect_to_fd")]
-        public Connection.to_fd (int fd, AuthInfo? auth_info);
+        public BaseConnection.to_fd (int fd, AuthInfo? auth_info);
 
         /**
          * Forces any buffered output to be written to the server.
@@ -436,7 +436,7 @@ namespace Xcb
         {
             internal int rem;
             internal int index;
-            internal unowned Screen data;
+            internal unowned Screen? data;
         }
 
         /**
@@ -507,4 +507,6 @@ namespace Xcb
             return null;
         }
     }
+
+    public const uint8 COPY_FROM_PARENT;
 }

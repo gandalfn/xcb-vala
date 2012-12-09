@@ -54,6 +54,20 @@ namespace XCBVala
             XmlObject.register_object ("type", typeof (XIDUnionType));
         }
 
+        public XIDType
+        copy (Root inRoot)
+        {
+            string ext = inRoot.extension_name == null ? "proto" : inRoot.extension_name;
+
+            XIDType xid_type = new XIDType ();
+            xid_type.name = name;
+            xid_type.base_type = ext + ":" + name;
+            xid_type.is_copy = true;
+            ValueType.add (ext + ":" + name, Root.format_vala_name (name), ext);
+
+            return xid_type;
+        }
+
         public void
         on_child_added (XmlObject inChild)
         {

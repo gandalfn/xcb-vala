@@ -72,7 +72,12 @@ namespace XCBVala
             if (val != null)
             {
                 if (val.m_ExtensionName != null)
-                    return "Xcb." + Root.format_vala_name (val.m_ExtensionName) + "." + val.m_Val;
+                {
+                    if (val.m_ExtensionName == "proto")
+                        return "Xcb." + val.m_Val;
+                    else
+                        return "Xcb." + Root.format_vala_name (val.m_ExtensionName) + "." + val.m_Val;
+                }
                 else
                     return val.m_Val;
             }

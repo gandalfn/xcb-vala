@@ -26,6 +26,7 @@ xcb_vala_parser_SOURCES = \
     union.vala \
     list.vala \
     value-item.vala \
+    value-param.vala \
     xid-type.vala \
     xid-union.vala \
     xid-union-type.vala \
@@ -37,6 +38,7 @@ xcb_vala_parser_LDADD = \
 
 VALAFILES = $(filter %.vala,$(xcb_vala_parser_SOURCES))
 
-CLEANFILES = \
+CLEANFILES += \
+    xcb_vala_parser_vala.stamp \
     $(VALAFILES:.vala=.c) \
     $(VALAFILES:.vala=.h)

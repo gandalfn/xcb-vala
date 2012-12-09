@@ -45,6 +45,7 @@ namespace XCBVala
         public int    pos            { get; set; default = 0; }
         public string characters     { get; set; default = null; }
         public string base_type      { get; set; default = "uint32"; }
+        public bool   is_copy        { get; set; default = false; }
 
         // methods
         construct
@@ -52,18 +53,18 @@ namespace XCBVala
             m_Childs = new Set<XmlObject> (XmlObject.compare);
         }
 
-        private bool
-        have_create_request ()
+        public XIDType
+        copy (Root inRoot)
         {
-            foreach (unowned XmlObject child in childs)
-            {
-                if (child is Request && ((Request)child).function_name == "create")
-                {
-                    return true;
-                }
-            }
+            string ext = inRoot.extension_name == null ? "proto" : inRoot.extension_name;
 
-            return false;
+            XIDType xid_type = new XIDType ();
+            xid_type.name = name;
+            xid_type.base_type = ext + ":" + name;
+            xid_type.is_copy = true;
+            ValueType.add (ext + ":" + name, Root.format_vala_name (name), ext);
+
+            return xid_type;
         }
 
         public void
@@ -80,14 +81,23 @@ namespace XCBVala
         public string
         to_string (string inPrefix)
         {
-            string ret = inPrefix + "[CCode (cname = \"xcb_%s_t\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
+            string ret;
+
+            if (!is_copy)
+            {
+                ret = inPrefix + "[CCode (cname = \"xcb_%s_t\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
+            }
+            else
+            {
+                string[] t = base_type.split(":");
+
+                ret = inPrefix + "[CCode (cname = \"xcb_%s_t\")]\n".printf (Root.format_c_name (t[0], t[1]));
+            }
             string derived_type = ValueType.get_derived (base_type);
             ret += inPrefix + "public struct %s : %s {\n".printf (Root.format_vala_name (name), derived_type != null ? derived_type : "uint32");
-            if (have_create_request ())
-            {
-                ret += inPrefix + "\t[CCode (cname = \"xcb_generate_id\")];\n";
-                ret += inPrefix + "\tpublic %s (Connection connection);\n\n".printf (Root.format_vala_name (name));
-            }
+            ret += inPrefix + "\t[CCode (cname = \"xcb_generate_id\")]\n";
+            ret += inPrefix + "\tpublic %s (Connection connection);\n\n".printf (Root.format_vala_name (name));
+
             foreach (unowned XmlObject child in childs_unsorted)
             {
                 ret += child.to_string (inPrefix + "\t");

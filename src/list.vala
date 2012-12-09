@@ -122,7 +122,7 @@ namespace XCBVala
                 {
                     if (parent is Request)
                     {
-                        ret += inPrefix + "[CCode (array_length = false)]";
+                        ret += inPrefix + "[CCode (array_length_pos = %i.%i)]".printf (pos, pos);
                         ret += "%s[] %s".printf (ValueType.get (attrtype), name);
                     }
                     else

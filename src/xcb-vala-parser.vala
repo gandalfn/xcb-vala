@@ -28,6 +28,11 @@ main (string[] inArgs)
         XCBVala.XmlObject root = parser.parse ("xcb");
 
         GLib.FileUtils.set_contents (inArgs[2], root.to_string (""));
+
+        string deps = "xcb-base\n";
+        foreach (string dep in (root as XCBVala.Root).deps)
+            deps += "%s\n".printf (dep);
+        GLib.FileUtils.set_contents (inArgs[2].replace (".vapi", ".deps"), deps);
     }
     catch (GLib.Error e)
     {
