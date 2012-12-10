@@ -108,7 +108,9 @@ namespace XCBVala
             }
             string derived_type = ValueType.get_derived (base_type);
             ret += inPrefix + "public struct %s : %s {\n".printf (Root.format_vala_name (name), derived_type != null ? derived_type : "uint32");
-            if (have_create_request () || Root.format_vala_name (name) == "Gcontext")
+            if (have_create_request ()                     ||
+                Root.format_vala_name (name) == "Gcontext" ||
+                Root.format_vala_name (name) == "Font")
             {
                 ret += inPrefix + "\t[CCode (cname = \"xcb_generate_id\")]\n";
                 ret += inPrefix + "\tpublic %s (Connection connection);\n\n".printf (Root.format_vala_name (name));

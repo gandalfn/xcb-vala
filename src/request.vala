@@ -52,6 +52,11 @@ namespace XCBVala
                 return m_Owner;
             }
         }
+        public int owner_pos {
+            get {
+                return m_OwnerPos;
+            }
+        }
         public string function_name {
             owned get {
                 return format_function_name ();
@@ -105,7 +110,7 @@ namespace XCBVala
                     if (ValueType.get (field.attrtype) == Root.format_vala_name (xid_type.name))
                     {
                         m_Owner = xid_type;
-                        m_OwnerPos = field.pos + 1;
+                        m_OwnerPos = field.pos;
                         return true;
                     }
                 }
@@ -114,7 +119,7 @@ namespace XCBVala
                     if (ValueType.get (field.attrtype) == Root.format_vala_name (xid_union.name))
                     {
                         m_Owner = xid_union;
-                        m_OwnerPos = field.pos + 1;
+                        m_OwnerPos = field.pos;
                         return true;
                     }
                 }
@@ -144,58 +149,76 @@ namespace XCBVala
         public string
         to_string (string inPrefix)
         {
-            string ret = inPrefix;
+            string[] suffix = { "", "_checked" };
+            string ret = "";
+            int nb = 1;
 
-            if (m_OwnerPos > 0)
-            {
-                GLib.List<unowned Field> fields = find_childs_of_type<unowned Field> ();
-                if (m_OwnerPos == fields.length ())
-                    ret += "[CCode (cname = \"xcb_%s\", instance_pos=-1)]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
+            if (m_Reply == null)
+                nb = 2;
 
-                else
-                    ret += "[CCode (cname = \"xcb_%s\", instance_pos=%i.%i)]\n".printf (Root.format_c_name ((root as Root).extension_name, name),
-                                                                                          m_OwnerPos, m_OwnerPos);
-            }
-            else
-                ret += "[CCode (cname = \"xcb_%s\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
-
-            string reply = "VoidCookie";
-            if (m_Reply != null)
-                reply = "%sCookie".printf (Root.format_vala_name (name));
-
-            bool first = true;
-            if (m_Owner != null)
+            for (int cpt = 0; cpt < nb; ++cpt)
             {
-                ret += inPrefix + "public %s %s (Connection connection".printf (reply, format_function_name ());
-                first = false;
-            }
-            else
-            {
-                ret += inPrefix + "public %s %s (".printf (reply, format_function_name ());
-                first = true;
-            }
-            foreach (unowned XmlObject child in childs_unsorted)
-            {
-                if (!(child is Reply))
+                if (m_OwnerPos >= 0)
                 {
-                    if (child.pos + 1 != m_OwnerPos)
+                    GLib.List<unowned Field> fields = find_childs_of_type<unowned Field> ();
+                    if (m_OwnerPos == fields.length ())
                     {
-                        string str;
-
-                        if (!first)
-                            str = child.to_string (", ");
-                        else
-                            str = child.to_string ("");
-
-                        if (str.length > 0)
+                        ret += inPrefix + "[CCode (cname = \"xcb_%s%s\", instance_pos=-1)]\n".printf (Root.format_c_name ((root as Root).extension_name, name), suffix[cpt]);
+                    }
+                    else
+                    {
+                        int pos = m_OwnerPos;
+                        GLib.List<unowned List> lists = find_childs_of_type<List> ();
+                        foreach (unowned List list in lists)
                         {
-                            ret += str;
-                            first = false;
+                            if (list.array_len_pos + 1 <= m_OwnerPos)
+                                pos = int.max (--pos, 0);
+                        }
+                        ret += inPrefix + "[CCode (cname = \"xcb_%s%s\", instance_pos=%i.%i)]\n".printf (Root.format_c_name ((root as Root).extension_name, name), suffix[cpt],
+                                                                                                         pos + 1, m_OwnerPos + 1);
+                    }
+                }
+                else
+                    ret += inPrefix + "[CCode (cname = \"xcb_%s%s\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name), suffix[cpt]);
+
+                string reply = "VoidCookie";
+                if (m_Reply != null)
+                    reply = "%sCookie".printf (Root.format_vala_name (name));
+
+                bool first = true;
+                if (m_Owner != null)
+                {
+                    ret += inPrefix + "public %s %s%s (Connection connection".printf (reply, format_function_name (), suffix[cpt]);
+                    first = false;
+                }
+                else
+                {
+                    ret += inPrefix + "public %s %s%s (".printf (reply, format_function_name (), suffix[cpt]);
+                    first = true;
+                }
+                foreach (unowned XmlObject child in childs_unsorted)
+                {
+                    if (!(child is Reply))
+                    {
+                        if (child.pos != m_OwnerPos)
+                        {
+                            string str;
+
+                            if (!first)
+                                str = child.to_string (", ");
+                            else
+                                str = child.to_string ("");
+
+                            if (str.length > 0)
+                            {
+                                ret += str;
+                                first = false;
+                            }
                         }
                     }
                 }
+                ret += ");\n";
             }
-            ret += ");\n";
 
             return ret;
         }

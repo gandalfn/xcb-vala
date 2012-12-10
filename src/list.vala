@@ -25,6 +25,7 @@ namespace XCBVala
     {
         // properties
         private Set<XmlObject> m_Childs;
+        private int            m_ArrayLenPos = -1;
 
         // accessors
         protected string tag_name {
@@ -46,6 +47,12 @@ namespace XCBVala
         public string attrtype       { get; set; default = null; }
         public string characters     { get; set; default = null; }
         public string field_ref      { get; set; default = null; }
+
+        public int array_len_pos {
+            get {
+                return m_ArrayLenPos;
+            }
+        }
 
         // methods
         construct
@@ -71,6 +78,10 @@ namespace XCBVala
                         {
                             (child as Field).is_ref = true;
                             field_ref = item.characters;
+                            if (parent is Request)
+                            {
+                                m_ArrayLenPos = child.pos;
+                            }
                             break;
                         }
                     }
@@ -88,7 +99,15 @@ namespace XCBVala
                 {
                     if (parent is Request)
                     {
-                        ret += inPrefix + "%s[] %s".printf (ValueType.get (attrtype), name);
+                        if (m_ArrayLenPos >= 0)
+                        {
+                            int pos = m_ArrayLenPos + 1;
+                            if ((parent as Request).owner_pos <= m_ArrayLenPos)
+                                pos = int.max (m_ArrayLenPos, 1);
+                            ret += inPrefix +  "[CCode (array_length_pos = %i.%i)]".printf (pos, m_ArrayLenPos + 1);
+                        }
+
+                        ret += "%s[] %s".printf (ValueType.get (attrtype), name);
                     }
                     else
                     {

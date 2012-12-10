@@ -471,7 +471,12 @@ namespace XCBVala
                 ret += inPrefix + "[CCode (cheader_filename=\"xcb/xcb.h,xcb/%s.h\")]\n".printf (header);
 
             if (extension_name != null)
-                ret += inPrefix + "namespace Xcb.%s\n".printf (extension_name);
+            {
+                if (extension_name == "GenericEvent")
+                    ret += inPrefix + "namespace Xcb.GE\n";
+                else
+                    ret += inPrefix + "namespace Xcb.%s\n".printf (extension_name);
+            }
             else
                 ret += inPrefix + "namespace Xcb\n";
 
