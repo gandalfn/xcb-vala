@@ -91,7 +91,7 @@ namespace XCBVala
             ValueType.add (name, Root.format_vala_name (name), (root as Root).extension_name);
         }
 
-        public string
+        public virtual string
         to_string (string inPrefix)
         {
             string ret;

@@ -32,31 +32,6 @@ namespace XCBVala
         private GLib.MappedFile m_File;
         private bool            m_EmptyElement = false;
 
-        // static methods
-        static construct
-        {
-            XmlObject.register_object ("import",    typeof (Import));
-            XmlObject.register_object ("xcb",       typeof (Root));
-            XmlObject.register_object ("struct",    typeof (Class));
-            XmlObject.register_object ("field",     typeof (Field));
-            XmlObject.register_object ("typedef",   typeof (Typedef));
-            XmlObject.register_object ("xidtype",   typeof (XIDType));
-            XmlObject.register_object ("xidunion",  typeof (XIDUnion));
-            XmlObject.register_object ("enum",      typeof (Enum));
-            XmlObject.register_object ("item",      typeof (Item));
-            XmlObject.register_object ("event",     typeof (Event));
-            XmlObject.register_object ("eventcopy", typeof (EventCopy));
-            XmlObject.register_object ("error",     typeof (Error));
-            XmlObject.register_object ("errorcopy", typeof (ErrorCopy));
-            XmlObject.register_object ("union",     typeof (Union));
-            XmlObject.register_object ("list",      typeof (List));
-            XmlObject.register_object ("value",     typeof (ValueItem));
-            XmlObject.register_object ("valueparam",typeof (ValueParam));
-            XmlObject.register_object ("fieldref",  typeof (FieldRef));
-            XmlObject.register_object ("request",   typeof (Request));
-            XmlObject.register_object ("reply",     typeof (Reply));
-        }
-
         // methods
         /**
          * Create a new xml parser from a filename

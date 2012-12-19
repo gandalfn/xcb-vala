@@ -96,7 +96,7 @@ namespace XCBVala
             XmlObject.unregister_object ("type");
         }
 
-        public string
+        public virtual string
         to_string (string inPrefix)
         {
             string ret = inPrefix + "[CCode (cname = \"xcb_%s_t\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name));

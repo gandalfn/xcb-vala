@@ -103,28 +103,27 @@ main (string[] inArgs)
 
     /* event loop */
     Xcb.GenericEvent event;
-    while (true)
+    while ((event = connection.wait_for_event ()) != null)
     {
-        if ((event = connection.poll_for_event ()) != null)
+        switch (event.response_type & ~0x80)
         {
-            switch (event.response_type & ~0x80)
-            {
-                case Xcb.EventType.EXPOSE:
-                    draw_text (connection, screen, window, 10, 90 - 10, "Press ESC key to exit...");
-                    connection.flush ();
-                    break;
+            case Xcb.EventType.EXPOSE:
+                draw_text (connection, screen, window, 10, 90 - 10, "Press ESC key to exit...");
+                connection.flush ();
+                break;
 
-                case Xcb.EventType.KEY_RELEASE:
-                    unowned Xcb.KeyReleaseEvent? kr = (Xcb.KeyReleaseEvent?)event;
+            case Xcb.EventType.KEY_RELEASE:
+                unowned Xcb.KeyReleaseEvent? kr = (Xcb.KeyReleaseEvent?)event;
 
-                    switch (kr.detail)
-                    {
-                        /* ESC */
-                        case 9:
-                            return 0;
-                    }
-                    break;
-            }
+                switch (kr.detail)
+                {
+                    /* ESC */
+                    case 9:
+                        return 0;
+                }
+                break;
         }
     }
+
+    return 0;
 }

@@ -1,4 +1,4 @@
-/* xcb-vala-parser.vala
+/* xid-union.vala
  *
  * Copyright (C) 2012  Nicolas Bruguier
  *
@@ -19,25 +19,14 @@
  *  Nicolas Bruguier <nicolas.bruguier@supersonicimagine.fr>
  */
 
-static int
-main (string[] inArgs)
+namespace XCBValaCodegen
 {
-    try
+    public class XIDUnion : XCBVala.XIDUnion, Object
     {
-        XCBVala.XmlParser parser = new XCBVala.XmlParser (inArgs[1]);
-        XCBVala.XmlObject root = parser.parse ("xcb");
-
-        GLib.FileUtils.set_contents (inArgs[2], root.to_string (""));
-
-        string deps = "xcb-base\n";
-        foreach (string dep in (root as XCBVala.Root).deps)
-            deps += "%s\n".printf (dep);
-        GLib.FileUtils.set_contents (inArgs[2].replace (".vapi", ".deps"), deps);
+        public override string
+        to_string (string inPrefix)
+        {
+            return generate ();
+        }
     }
-    catch (GLib.Error e)
-    {
-        warning ("%s", e.message);
-    }
-
-    return 0;
 }

@@ -1,8 +1,13 @@
 include $(top_srcdir)/build/vala.am
 
-noinst_PROGRAMS = xcb-vala-parser
+noinst_LTLIBRARIES = libxcb-vala-parser.la
 
-xcb_vala_parser_SOURCES = \
+libxcb_vala_parser_la_VALAFLAGS = \
+    --header=xcb-vala-parser.h \
+    --library=xcb-vala-parser \
+    --vapi=xcb-vala-parser.vapi
+
+libxcb_vala_parser_la_SOURCES = \
     set.vala \
     value.vala \
     parser.vala \
@@ -31,14 +36,52 @@ xcb_vala_parser_SOURCES = \
     xid-union.vala \
     xid-union-type.vala \
     connection.vala \
-    xcb-vala-parser.vala
+    codegen/root.vala \
+    codegen/object.vala \
+    codegen/method.vala \
+    codegen/error.vala \
+    codegen/xid-type.vala \
+    codegen/xid-union.vala
 
-xcb_vala_parser_LDADD = \
+libxcb_vala_parser_la_LIBADD = \
     $(XCB_VALA_LIBS)
 
-VALAFILES = $(filter %.vala,$(xcb_vala_parser_SOURCES))
+noinst_PROGRAMS = \
+    xcb-vapigen \
+    xcb-valagen
+
+xcb_vapigen_VALAFLAGS = \
+    --vapidir=. \
+    --pkg=xcb-vala-parser
+
+xcb_vapigen_SOURCES = \
+    xcb-vapigen.vala
+
+xcb_vapigen_LDADD = \
+    $(XCB_VALA_LIBS) \
+    libxcb-vala-parser.la
+
+xcb_valagen_VALAFLAGS = \
+    --vapidir=. \
+    --pkg=xcb-vala-parser
+
+xcb_valagen_SOURCES = \
+    xcb-valagen.vala
+
+xcb_valagen_LDADD = \
+    $(XCB_VALA_LIBS) \
+    libxcb-vala-parser.la
+
+VALAFILES = \
+    $(filter %.vala,$(xcb_vapigen_SOURCES)) \
+    $(filter %.vala,$(xcb_valagen_SOURCES)) \
+    $(filter %.vala,$(libxcb_vala_parser_la_SOURCES))
 
 CLEANFILES += \
-    xcb_vala_parser_vala.stamp \
+    libxcb_vala_parser_la_vala.stamp \
+    xcb_vapigen_vala.stamp \
+    xcb_valagen_vala.stamp \
     $(VALAFILES:.vala=.c) \
     $(VALAFILES:.vala=.h)
+
+.NOTPARALLEL: libxcb-vala-parser.la xcb-vapigen
