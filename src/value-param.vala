@@ -88,12 +88,22 @@ namespace XCBVala
                     }
                 }
             }
-            if (!found)
-            {
-                ret += "%s %s = 0, ".printf (ValueType.get (value_mask_type), value_mask_name);
-            }
 
-            ret += "[CCode (array_length = false)]uint32[]? %s = null".printf (value_list_name);
+            if (parent is Reply)
+            {
+                ret += "public %s %s;\n".printf (ValueType.get (value_mask_type), value_mask_name);
+                ret += inPrefix + "[CCode (array_length = false)]\n";
+                ret += inPrefix + "public uint32[]? %s;\n".printf (value_list_name);
+            }
+            else
+            {
+                if (!found)
+                {
+                    ret += "%s %s = 0, ".printf (ValueType.get (value_mask_type), value_mask_name);
+                }
+
+                ret += "[CCode (array_length = false)]uint32[]? %s = null".printf (value_list_name);
+            }
             return ret;
         }
     }

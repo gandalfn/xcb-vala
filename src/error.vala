@@ -81,7 +81,7 @@ namespace XCBVala
         {
             string ret = inPrefix + "[Compact, CCode (cname = \"xcb_%s_error_t\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
 
-            ret += inPrefix + "public class %sError : GenericError {\n".printf (Root.format_vala_name (name));
+            ret += inPrefix + "public class %sError : Xcb.GenericError {\n".printf (Root.format_vala_name (name));
             foreach (unowned XmlObject child in childs_unsorted)
             {
                 ret += child.to_string (inPrefix + "\t");

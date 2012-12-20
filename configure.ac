@@ -45,6 +45,22 @@ PKG_CHECK_MODULES(XCB_VALA, [glib-2.0 >= $GLIB_REQUIRED
 AC_SUBST(XCB_VALA_CFLAGS)
 AC_SUBST(XCB_VALA_LIBS)
 
+dnl ****************************************************************************
+dnl Check for valadoc
+dnl ****************************************************************************
+found_valadoc=no
+AS_IF([test "x$enable_valadoc" != "xno"], [
+    AC_PATH_PROG(VALADOC, valadoc, :)
+    AS_IF([test -x "$VALADOC"], [
+      found_valadoc=yes
+      AC_SUBST(VALADOC)
+    ], [
+      AS_IF([test "x$enable_valadoc" == "xyes"], AC_MSG_ERROR([Unable to find valadoc]))
+    ])
+  ])
+
+AM_CONDITIONAL(ENABLE_VALADOC, test x$found_valadoc = xyes)
+
 XCB_XML_PATH=$($PKG_CONFIG --variable=xcbincludedir xcb-proto)
 AC_SUBST(XCB_XML_PATH)
 
@@ -53,6 +69,7 @@ Makefile
 src/Makefile
 test/Makefile
 vapi/Makefile
+doc/Makefile
 ])
 
 AC_OUTPUT

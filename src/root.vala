@@ -232,6 +232,8 @@ namespace XCBVala
             ValueType.add ("BYTE",   "uint8",  extension_name);
             ValueType.add ("BOOL",   "bool",   extension_name);
             ValueType.add ("char",   "char",   extension_name);
+            ValueType.add ("float",  "float",  extension_name);
+            ValueType.add ("double", "double", extension_name);
             ValueType.add ("void",   "void",   extension_name);
         }
 

@@ -46,6 +46,14 @@ namespace XCBVala
         public int    pos            { get; set; default = 0; }
         public string characters     { get; set; default = null; }
         public bool   is_mask        { get; set; default = false; }
+        public bool have_type_suffix {
+            get {
+                return m_HaveTypeSuffix;
+            }
+            set {
+                m_HaveTypeSuffix = value;
+            }
+        }
 
         // methods
         construct
@@ -66,6 +74,11 @@ namespace XCBVala
                 m_HaveTypeSuffix = true;
             }
             else if (Root.format_vala_name (name) == "Connection")
+            {
+                m_HaveTypeSuffix = true;
+                ValueType.add (name, Root.format_vala_name (name) + "Type", (root as Root).extension_name);
+            }
+            else if (Root.format_vala_name (name) == "ScreenSaver")
             {
                 m_HaveTypeSuffix = true;
                 ValueType.add (name, Root.format_vala_name (name) + "Type", (root as Root).extension_name);

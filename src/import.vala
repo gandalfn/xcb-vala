@@ -72,6 +72,9 @@ namespace XCBVala
             if (characters == "xproto")
                 return "";
 
+            if (characters == "xfixes")
+                return "using Xcb.XFixes;\n";
+
             return "using Xcb.%s;\n".printf (Root.format_vala_name (characters));
         }
     }

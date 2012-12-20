@@ -88,6 +88,19 @@ namespace XCBVala
         public void
         on_end ()
         {
+            if (ValueType.get(name) != null)
+            {
+                GLib.List<unowned Enum?> enums = root.find_childs_of_type<Enum> ();
+                foreach (unowned Enum @enum in enums)
+                {
+                    if (@enum.name.down() == name.down())
+                    {
+                        @enum.have_type_suffix = true;
+                        break;
+                    }
+                }
+            }
+
             ValueType.add (name, Root.format_vala_name (name), (root as Root).extension_name);
         }
 
