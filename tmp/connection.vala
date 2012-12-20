@@ -24,48 +24,6 @@ public errordomain Xcb.Vala.ConnectionError
     WATCH
 }
 
-public errordomain Xcb.Vala.Error
-{
-    BAD_REQUEST,
-    BAD_VALUE,
-    BAD_WINDOW,
-    BAD_PIXMAP,
-    BAD_ATOM,
-    BAD_CURSOR,
-    BAD_FONT,
-    BAD_MATCH,
-    BAD_DRAWABLE,
-    BAD_ACCESS,
-    BAD_ALLOC,
-    BAD_COLOR,
-    BAD_GC,
-    BAD_ID_CHOICE,
-    BAD_NAME,
-    BAD_LENGTH,
-    BAD_IMPLEMENTATION;
-
-    public static void
-    from_xerror (int inCode) throws Error
-    {
-        switch (inCode)
-        {
-            case 0:
-                return;
-
-            case 1:
-                throw new Error.BAD_REQUEST("invalid request code or no such operation");
-
-            case 2:
-                throw new Error.BAD_VALUE("integer parameter out of range for operation");
-
-            case 3:
-                throw new Error.BAD_WINDOW("invalid Window parameter");
-        }
-
-        return;
-    }
-}
-
 public class Xcb.Vala.Connection : GLib.Object
 {
     // properties
@@ -145,11 +103,5 @@ public class Xcb.Vala.Connection : GLib.Object
     process_events ()
     {
         _loop.run ();
-    }
-
-    public async void
-    grab_pointer_checked () throws Xcb.Vala.Error
-    {
-        Xcb.Vala.Error.from_xerror (1);
     }
 }

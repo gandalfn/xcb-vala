@@ -23,8 +23,22 @@ namespace XCBValaCodegen
 {
     public class Error : XCBVala.Request
     {
+        // types
+        public struct Entry
+        {
+            public int    num;
+            public string name;
+            public string comment;
+
+            public static int
+            compare (Entry? inA, Entry? inB)
+            {
+                return inA.num - inB.num;
+            }
+        }
+
         // properties
-        private GLib.HashTable<int?, string> m_Items;
+        private XCBVala.Set<Entry?> m_Items;
 
         // static methods
         public static string
@@ -56,7 +70,7 @@ namespace XCBValaCodegen
         // methods
         public Error (string inFilename)
         {
-            m_Items = new GLib.HashTable<int?, string> (GLib.int_hash, GLib.int_equal);
+            m_Items = new XCBVala.Set<Entry?> (Entry.compare);
 
             try
             {
@@ -72,28 +86,34 @@ namespace XCBValaCodegen
                         int num = int.parse (cur);
                         if (num > 0)
                         {
-                            bool end = false;
-                            for (int cpt = 0; !end && s[cpt] != 0; ++cpt)
+                            GLib.StringBuilder name = new GLib.StringBuilder("");
+                            GLib.StringBuilder comment = new GLib.StringBuilder("");
+                            for (int cpt = 0; s[cpt] != 0; ++cpt)
                             {
                                 char c = s [cpt];
                                 if (c == ':')
                                 {
-                                    GLib.StringBuilder name = new GLib.StringBuilder("");
                                     bool begin = false;
-                                    for (int i = cpt + 1; !end && s[i] != 0; ++i)
+                                    bool is_name = false;
+                                    for (int i = cpt + 1; s[i] != 0; ++i)
                                     {
-                                        if (s[i] == ' ')
+                                        if (s[i] == ' ' && !is_name)
                                         {
                                             if (!begin)
                                             {
                                                 begin = true;
                                                 continue;
                                             }
-                                            else
+                                            else if (!is_name)
                                             {
-                                                m_Items.insert (num, format_name (name.str));
-                                                end = true;
+                                                is_name = true;
+                                                continue;
                                             }
+                                        }
+                                        else if (is_name)
+                                        {
+                                            if (s[i] != '(' && s[i] != ')')
+                                                comment.append_unichar (s[i]);
                                         }
                                         else
                                         {
@@ -102,6 +122,7 @@ namespace XCBValaCodegen
                                     }
                                 }
                             }
+                            m_Items.insert ({ num, format_name (name.str), comment.str });
                         }
                     }
                 }
@@ -148,14 +169,12 @@ namespace XCBValaCodegen
                 ret += "public errordomain Xcb.Vala.Error\n";
                 ret += "{\n";
                 bool is_first = true;
-                GLib.List<unowned int?> keys = m_Items.get_keys ();
-                keys.reverse ();
-                foreach (int num in keys)
+                foreach (unowned Entry? entry in m_Items)
                 {
                     if (is_first)
-                        ret += "\t%s".printf (m_Items[num]);
+                        ret += "\t%s".printf (entry.name);
                     else
-                        ret += ",\n\t%s".printf (m_Items[num]);
+                        ret += ",\n\t%s".printf (entry.name);
                     is_first = false;
                 }
                 ret += ";\n\n";
@@ -163,10 +182,10 @@ namespace XCBValaCodegen
                 ret += "\t{\n";
                 ret += "\t\tswitch (inCode)\n";
                 ret += "\t\t{\n";
-                foreach (int num in keys)
+                foreach (unowned Entry? entry in m_Items)
                 {
-                    ret += "\t\t\tcase %i:\n".printf (num);
-                    ret += "\t\t\t\tthrow new Error.%s (\"\");\n".printf (m_Items[num]);
+                    ret += "\t\t\tcase %i:\n".printf (entry.num);
+                    ret += "\t\t\t\tthrow new Error.%s (\"%s\");\n".printf (entry.name, entry.comment);
                 }
                 ret += "\t\t}\n";
                 ret += "\t\treturn;\n";
