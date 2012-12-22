@@ -176,9 +176,12 @@ namespace XCBVala
             for (int cpt = 0; s[cpt] != 0; ++cpt)
             {
                 char c = s [cpt];
-                if (c.isupper() || c.isdigit ())
+                char* ptr = &s[cpt];
+                string str = (string)ptr;
+                bool force = ret.str.has_suffix ("fb") || str.has_prefix ("config");
+                if (c.isupper() || c.isdigit () || force)
                 {
-                    if (!previous_is_upper) ret.append_unichar ('_');
+                    if (!previous_is_upper || force) ret.append_unichar ('_');
                     ret.append_unichar (c.tolower());
                     previous_is_upper = true;
                 }

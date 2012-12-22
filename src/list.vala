@@ -95,6 +95,8 @@ namespace XCBVala
             string ret = "";
             if (attrtype != null && ValueType.get (attrtype) != null)
             {
+                bool is_reply = false;
+
                 if (field_ref != null)
                 {
                     if (parent is Request)
@@ -108,6 +110,10 @@ namespace XCBVala
                         }
 
                         ret += "%s[] %s".printf (ValueType.get (attrtype), name);
+                    }
+                    else if (parent is Reply)
+                    {
+                        is_reply = true;
                     }
                     else
                     {
@@ -125,6 +131,10 @@ namespace XCBVala
                             if (child is ValueItem)
                                 ret += "[%i]".printf (int.parse (child.characters));
                         }
+                    }
+                    else if (parent is Reply)
+                    {
+                        is_reply = true;
                     }
                     else
                     {
@@ -144,11 +154,43 @@ namespace XCBVala
                         ret += inPrefix + "[CCode (array_length_pos = %i.%i)]".printf (pos, pos);
                         ret += "%s[] %s".printf (ValueType.get (attrtype), name);
                     }
+                    else if (parent is Reply)
+                    {
+                        is_reply = true;
+                    }
                     else
                     {
                         ret += inPrefix + "[CCode (array_length = false)]\n";
                         ret += inPrefix + "public %s[] %s;\n".printf (ValueType.get (attrtype), name);
                     }
+                }
+
+                if (is_reply)
+                {
+                    if (ValueType.have_iterator (attrtype))
+                    {
+                        GLib.List<unowned List> lists = parent.find_childs_of_type<List> ();
+                        int cpt_iterator = 0;
+                        foreach (unowned List list in lists)
+                        {
+                            if (ValueType.have_iterator (list.attrtype))
+                            {
+                                cpt_iterator++;
+                            }
+                        }
+                        if (cpt_iterator == 1)
+                        {
+                            ret += inPrefix + "[CCode (cname = \"xcb_%s_%s_iterator\")]\n".printf (Root.format_c_name ((root as Root).extension_name, parent.parent.name),
+                                                                                                   Root.format_c_name (null, name));
+                            ret += inPrefix + "public %sIterator Iterator ();\n".printf (ValueType.get (attrtype));
+                        }
+                    }
+                    ret += inPrefix + "[CCode (cname = \"xcb_%s_%s_length\")]\n".printf (Root.format_c_name ((root as Root).extension_name, parent.parent.name),
+                                                                                         Root.format_c_name (null, name));
+                    ret += inPrefix + "public int %s_length ();\n".printf (Root.format_c_name (null, name));
+                    ret += inPrefix + "[CCode (cname = \"xcb_%s_%s\", array_length = false)]\n".printf (Root.format_c_name ((root as Root).extension_name, parent.parent.name),
+                                                                                                        Root.format_c_name (null, name));
+                    ret += inPrefix + "public %s[] %s ();\n".printf (ValueType.get (attrtype), Root.format_c_name (null, name));
                 }
             }
             else

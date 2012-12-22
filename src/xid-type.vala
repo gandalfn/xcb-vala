@@ -101,26 +101,58 @@ namespace XCBVala
                 }
             }
 
-            ValueType.add (name, Root.format_vala_name (name), (root as Root).extension_name);
+            ValueType.add (name, Root.format_vala_name (name), (root as Root).extension_name, true);
         }
 
         public virtual string
         to_string (string inPrefix)
         {
             string ret;
+            string cname;
 
             if (!is_copy)
             {
-                ret = inPrefix + "[CCode (cname = \"xcb_%s_t\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
+                cname = Root.format_c_name ((root as Root).extension_name, name);
             }
             else
             {
                 string[] t = base_type.split(":");
 
-                ret = inPrefix + "[CCode (cname = \"xcb_%s_t\")]\n".printf (Root.format_c_name (t[0], t[1]));
+                cname = Root.format_c_name (t[0], t[1]);
             }
+            ret = inPrefix + "[SimpleType, CCode (cname = \"xcb_%s_iterator_t\")]\n".printf (cname);
+            ret += inPrefix + "struct _%sIterator\n".printf (Root.format_vala_name (name));
+            ret += inPrefix + "{\n";
+            ret += inPrefix + "\tinternal int rem;\n";
+            ret += inPrefix + "\tinternal int index;\n";
+            ret += inPrefix + "\tinternal unowned %s? data;\n".printf (Root.format_vala_name (name));
+            ret += inPrefix + "}\n\n";
+
+            ret += inPrefix + "[CCode (cname = \"xcb_%s_iterator_t\")]\n".printf (cname);
+            ret += inPrefix + "public struct %sIterator\n".printf (Root.format_vala_name (name));
+            ret += inPrefix + "{\n";
+            ret += inPrefix + "\t[CCode (cname = \"xcb_%s_next\")]\n".printf (cname);
+            ret += inPrefix + "\tinternal void _next ();\n\n";
+            ret += inPrefix + "\tpublic inline unowned %s?\n".printf (Root.format_vala_name (name));
+            ret += inPrefix + "\tnext_value ()\n";
+            ret += inPrefix + "\t{\n";
+            ret += inPrefix + "\t\tif (((_%sIterator)this).rem > 0)\n".printf (Root.format_vala_name (name));
+            ret += inPrefix + "\t\t{\n";
+            ret += inPrefix + "\t\t\tunowned %s d = ((_%sIterator)this).data;\n".printf (Root.format_vala_name (name),
+                                                                                         Root.format_vala_name (name));
+            ret += inPrefix + "\t\t\t_next ();\n";
+            ret += inPrefix + "\t\t\treturn d;\n";
+            ret += inPrefix + "\t\t}\n";
+            ret += inPrefix + "\t\treturn null;\n";
+            ret += inPrefix + "\t}\n";
+            ret += inPrefix + "}\n\n";
+
+            ret += inPrefix + "[CCode (cname = \"xcb_%s_t\")]\n".printf (cname);
+
             string derived_type = ValueType.get_derived (base_type);
             ret += inPrefix + "public struct %s : %s {\n".printf (Root.format_vala_name (name), derived_type != null ? derived_type : "uint32");
+
+
             if (have_create_request ()                     ||
                 Root.format_vala_name (name) == "Gcontext" ||
                 Root.format_vala_name (name) == "Font")

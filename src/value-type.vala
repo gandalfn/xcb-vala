@@ -30,12 +30,13 @@ namespace XCBVala
         private string m_Name;
         private string m_Val;
         private string m_ExtensionName;
+        private bool   m_HaveIterator;
 
         // static methods
         public static void
-        add (string inName, string inVal, string? inExtensionName)
+        add (string inName, string inVal, string? inExtensionName, bool inHaveIterator = false)
         {
-            ValueType val = new ValueType (inName, inVal, inExtensionName);
+            ValueType val = new ValueType (inName, inVal, inExtensionName, inHaveIterator);
             s_Types.insert (val);
         }
 
@@ -62,7 +63,7 @@ namespace XCBVala
             return null;
         }
 
-        public static new string?
+        public static string?
         get_derived (string inName)
         {
             unowned ValueType? val = s_Types.search<string> (inName, (o, v) => {
@@ -85,17 +86,33 @@ namespace XCBVala
             return null;
         }
 
+        public static bool
+        have_iterator (string inName)
+        {
+            unowned ValueType? val = s_Types.search<string> (inName, (o, v) => {
+                return o.m_Name.ascii_casecmp (v);
+            });
+
+            if (val != null)
+            {
+                return val.m_HaveIterator;
+            }
+
+            return false;
+        }
+
         // methods
         static construct
         {
             s_Types = new Set<ValueType> (ValueType.compare);
         }
 
-        private ValueType (string inName, string inVal, string? inExtensionName)
+        private ValueType (string inName, string inVal, string? inExtensionName, bool inHaveIterator = false)
         {
             m_Name = inName;
             m_Val = inVal;
             m_ExtensionName = inExtensionName;
+            m_HaveIterator = inHaveIterator;
         }
 
         private int

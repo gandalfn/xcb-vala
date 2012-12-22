@@ -7,7 +7,7 @@ VALADOC_FLAGS = \
     --package-name xcb
 
 VALADOC_SRCS = \
-    $(top_srcdir)/vapi/*.vapi
+    $(top_srcdir)/vapi/xcb*.vapi
 
 valadoc-html: $(VALADOC_SRCS)
 	$(AM_V_GEN) rm -rf html; \

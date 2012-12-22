@@ -59,7 +59,7 @@ namespace XCBVala
         public void
         on_end ()
         {
-            ValueType.add (name, Root.format_vala_name (name), (root as Root).extension_name);
+            ValueType.add (name, Root.format_vala_name (name), (root as Root).extension_name, true);
         }
 
         public string
@@ -74,9 +74,37 @@ namespace XCBVala
             }
             else
             {
-                ret = inPrefix + "[CCode (cname = \"xcb_%s_t\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
+                ret = inPrefix + "[SimpleType, CCode (cname = \"xcb_%s_iterator_t\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
+                ret += inPrefix + "struct _%sIterator\n".printf (Root.format_vala_name (name));
+                ret += inPrefix + "{\n";
+                ret += inPrefix + "\tinternal int rem;\n";
+                ret += inPrefix + "\tinternal int index;\n";
+                ret += inPrefix + "\tinternal unowned %s? data;\n".printf (Root.format_vala_name (name));
+                ret += inPrefix + "}\n\n";
+
+                ret += inPrefix + "[CCode (cname = \"xcb_%s_iterator_t\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
+                ret += inPrefix + "public struct %sIterator\n".printf (Root.format_vala_name (name));
+                ret += inPrefix + "{\n";
+                ret += inPrefix + "\t[CCode (cname = \"xcb_%s_next\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
+                ret += inPrefix + "\tinternal void _next ();\n\n";
+                ret += inPrefix + "\tpublic inline unowned %s?\n".printf (Root.format_vala_name (name));
+                ret += inPrefix + "\tnext_value ()\n";
+                ret += inPrefix + "\t{\n";
+                ret += inPrefix + "\t\tif (((_%sIterator)this).rem > 0)\n".printf (Root.format_vala_name (name));
+                ret += inPrefix + "\t\t{\n";
+                ret += inPrefix + "\t\t\tunowned %s d = ((_%sIterator)this).data;\n".printf (Root.format_vala_name (name),
+                                                                                             Root.format_vala_name (name));
+                ret += inPrefix + "\t\t\t_next ();\n";
+                ret += inPrefix + "\t\t\treturn d;\n";
+                ret += inPrefix + "\t\t}\n";
+                ret += inPrefix + "\t\treturn null;\n";
+                ret += inPrefix + "\t}\n";
+                ret += inPrefix + "}\n\n";
+
+                ret += inPrefix + "[CCode (cname = \"xcb_%s_t\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
                 ret += inPrefix + "public struct %s {\n".printf (Root.format_vala_name (name));
             }
+
             foreach (unowned XmlObject child in childs_unsorted)
             {
                 ret += child.to_string (inPrefix + "\t");

@@ -41,7 +41,9 @@ dnl ****************************************************************************
 PKG_CHECK_MODULES(XCB_VALA, [glib-2.0 >= $GLIB_REQUIRED
                              gobject-2.0 >= $GLIB_REQUIRED
                              xcb
-                             xcb-proto])
+                             xcb-glx
+                             xcb-proto
+                             gl])
 AC_SUBST(XCB_VALA_CFLAGS)
 AC_SUBST(XCB_VALA_LIBS)
 
