@@ -21,8 +21,66 @@
 
 namespace XCBValaCodegen
 {
-    public class Method : XCBVala.Request
+    public class Method : XCBVala.Request, Member
     {
+        // accessors
+        public Visibility visibility { get; construct set; default = Visibility.PUBLIC; }
+
+        public bool is_constructor {
+            get {
+                string f = function_name;
+                return f == "create";
+            }
+        }
+
+        public bool is_destructor {
+            get {
+                string f = function_name;
+                return f == "destroy" || f == "free";
+            }
+        }
+
+        // methods
+        private string
+        generate_constructor (string inPrefix)
+        {
+            string ret = "%s%s %s (Xcb.Connection inConnection".printf (inPrefix, visibility.to_string (),
+                                                                        XCBVala.Root.format_vala_name (parent.name));
+            foreach (unowned XCBVala.XmlObject child in childs_unsorted)
+            {
+                if (!(child is XCBVala.Reply))
+                {
+                    if (child.pos != owner_pos)
+                    {
+                        string str = child.to_string (", ");
+                        if (str.length > 0)
+                        {
+                            ret += str;
+                        }
+                    }
+                }
+            }
+            ret += ")\n";
+            ret += inPrefix + "{\n";
+            ret += inPrefix + "\tGLib.Oject (connection: inConnection, xid: Xcb.%s (inConnection));\n".printf (XCBVala.Root.format_vala_name (parent.name));
+            ret += "\n";
+            ret += inPrefix + "\t" + generate_call ();
+            ret += inPrefix + "}\n";
+
+            return ret;
+        }
+
+        private string
+        generate_destructor (string inPrefix)
+        {
+            string ret = "%s~%s ()\n".printf (inPrefix, XCBVala.Root.format_vala_name (parent.name));
+            ret += inPrefix + "{\n";
+            ret += inPrefix + "\t" + generate_call ();
+            ret += inPrefix + "}\n";
+
+            return ret;
+        }
+
         public string
         generate_call ()
         {
@@ -34,9 +92,9 @@ namespace XCBValaCodegen
                 {
                     if (child.pos != owner_pos)
                     {
-                        if (child is XCBVala.Field && !(child as XCBVala.Field).is_ref)
+                        if (child is Field && !(child as Field).is_ref)
                         {
-                            ret += ", %s".printf (child.name);
+                            ret += ", %s".printf ((child as Field).generate_call ());
                         }
                         else if (child is XCBVala.ValueParam)
                         {
@@ -64,6 +122,67 @@ namespace XCBValaCodegen
             ret += ");\n";
 
             return ret;
+        }
+
+        public string
+        generate_declaration (string inPrefix)
+        {
+            string ret = "";
+
+            if (is_constructor)
+                return generate_constructor (inPrefix);
+
+            if (is_destructor)
+                return generate_destructor (inPrefix);
+
+            if (reply == null)
+            {
+                ret += inPrefix + "%s void\n%s%s (".printf (visibility.to_string (), inPrefix, function_name);
+
+                bool first = true;
+                foreach (unowned XCBVala.XmlObject child in childs_unsorted)
+                {
+                    if (!(child is XCBVala.Reply))
+                    {
+                        if (child.pos != owner_pos)
+                        {
+                            string str;
+
+                            if (!first)
+                                str = child.to_string (", ");
+                            else
+                                str = child.to_string ("");
+
+                            if (str.length > 0)
+                            {
+                                ret += str;
+                                first = false;
+                            }
+                        }
+                    }
+                }
+                ret += ")\n";
+                ret += inPrefix + "{\n";
+                ret += inPrefix + "\t%s".printf (generate_call ());
+                ret += inPrefix + "}\n";
+            }
+
+            return ret;
+        }
+
+        public int
+        compare (Method inOther)
+        {
+            if (is_constructor && !inOther.is_constructor)
+                return -1;
+            else if (!is_constructor && inOther.is_constructor)
+                return 1;
+            else if (is_destructor && !inOther.is_destructor)
+                return -1;
+            else if (!is_destructor && inOther.is_destructor)
+                return 1;
+
+            return 0;
         }
     }
 }

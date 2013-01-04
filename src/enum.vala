@@ -76,16 +76,16 @@ namespace XCBVala
             else if (Root.format_vala_name (name) == "Connection")
             {
                 m_HaveTypeSuffix = true;
-                ValueType.add (name, Root.format_vala_name (name) + "Type", (root as Root).extension_name);
+                ValueType.add (name, Root.format_vala_name (name) + "Type", (root as Root).extension_name, false);
             }
             else if (Root.format_vala_name (name) == "ScreenSaver")
             {
                 m_HaveTypeSuffix = true;
-                ValueType.add (name, Root.format_vala_name (name) + "Type", (root as Root).extension_name);
+                ValueType.add (name, Root.format_vala_name (name) + "Type", (root as Root).extension_name, false);
             }
             else
             {
-                ValueType.add (name, Root.format_vala_name (name), (root as Root).extension_name);
+                ValueType.add (name, Root.format_vala_name (name), (root as Root).extension_name, false);
             }
         }
 

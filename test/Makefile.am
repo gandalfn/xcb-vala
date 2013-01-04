@@ -55,13 +55,14 @@ xcb_glx_test_VALAFLAGS = \
 	--pkg=xcb-glx \
 	--pkg=gl \
 	--pkg=glx \
+	--pkg=glu \
 	--pkg=posix
 
 xcb_glx_test_SOURCES = \
 	xcb-glx-test.vala
 
 xcb_glx_test_LDADD = \
-	$(XCB_VALA_LIBS)
+	$(XCB_VALA_LIBS) -lGLU
 
 VALAFILES = \
     $(filter %.vala,$(simple_window_SOURCES)) \

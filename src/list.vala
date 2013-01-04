@@ -190,7 +190,7 @@ namespace XCBVala
                     ret += inPrefix + "public int %s_length ();\n".printf (Root.format_c_name (null, name));
                     ret += inPrefix + "[CCode (cname = \"xcb_%s_%s\", array_length = false)]\n".printf (Root.format_c_name ((root as Root).extension_name, parent.parent.name),
                                                                                                         Root.format_c_name (null, name));
-                    ret += inPrefix + "public %s[] %s ();\n".printf (ValueType.get (attrtype), Root.format_c_name (null, name));
+                    ret += inPrefix + "public unowned %s[] %s ();\n".printf (ValueType.get (attrtype), Root.format_c_name (null, name));
                 }
             }
             else

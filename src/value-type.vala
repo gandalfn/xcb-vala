@@ -30,13 +30,14 @@ namespace XCBVala
         private string m_Name;
         private string m_Val;
         private string m_ExtensionName;
+        private bool   m_IsXIDType;
         private bool   m_HaveIterator;
 
         // static methods
         public static void
-        add (string inName, string inVal, string? inExtensionName, bool inHaveIterator = false)
+        add (string inName, string inVal, string? inExtensionName, bool inIsXIDType, bool inHaveIterator = false)
         {
-            ValueType val = new ValueType (inName, inVal, inExtensionName, inHaveIterator);
+            ValueType val = new ValueType (inName, inVal, inExtensionName, inIsXIDType, inHaveIterator);
             s_Types.insert (val);
         }
 
@@ -87,6 +88,21 @@ namespace XCBVala
         }
 
         public static bool
+        is_xid_type (string inName)
+        {
+            unowned ValueType? val = s_Types.search<string> (inName, (o, v) => {
+                return o.m_Name.ascii_casecmp (v);
+            });
+
+            if (val != null)
+            {
+                return val.m_IsXIDType;
+            }
+
+            return false;
+        }
+
+        public static bool
         have_iterator (string inName)
         {
             unowned ValueType? val = s_Types.search<string> (inName, (o, v) => {
@@ -101,17 +117,33 @@ namespace XCBVala
             return false;
         }
 
+        public static string?
+        get_extension_name (string inName)
+        {
+            unowned ValueType? val = s_Types.search<string> (inName, (o, v) => {
+                return o.m_Name.ascii_casecmp (v);
+            });
+
+            if (val != null)
+            {
+                return val.m_ExtensionName;
+            }
+
+            return null;
+        }
+
         // methods
         static construct
         {
             s_Types = new Set<ValueType> (ValueType.compare);
         }
 
-        private ValueType (string inName, string inVal, string? inExtensionName, bool inHaveIterator = false)
+        private ValueType (string inName, string inVal, string? inExtensionName, bool inIsXIDType, bool inHaveIterator = false)
         {
             m_Name = inName;
             m_Val = inVal;
             m_ExtensionName = inExtensionName;
+            m_IsXIDType = inIsXIDType;
             m_HaveIterator = inHaveIterator;
         }
 

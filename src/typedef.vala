@@ -70,7 +70,7 @@ namespace XCBVala
         public void
         on_end ()
         {
-            ValueType.add (newname, Root.format_vala_name (newname), (root as Root).extension_name);
+            ValueType.add (newname, Root.format_vala_name (newname), (root as Root).extension_name, false);
         }
 
         public string

@@ -21,11 +21,18 @@
 
 namespace XCBValaCodegen
 {
-    public class XIDType : XCBVala.XIDType, Object
+    public class XIDType : XCBVala.XIDType, Member, Object
     {
+        // accessors
+        public Visibility visibility { get; construct set; default = Visibility.PUBLIC; }
+        public XCBVala.Set<Accessor> accessors { get; set; default = new XCBVala.Set<Accessor> (Accessor.compare); }
+
+        // methods
         public override string
         to_string (string inPrefix)
         {
+            register ();
+
             return generate ();
         }
     }

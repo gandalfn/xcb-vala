@@ -21,65 +21,10 @@
 
 namespace XCBValaCodegen
 {
-    public interface Object : GLib.Object, XCBVala.XmlObject
+    public interface Object : GLib.Object, XCBVala.XmlObject, Member
     {
-        // types
-        public enum Visibility
-        {
-            PRIVATE,
-            PROTECTED,
-            PUBLIC,
-            INTERNAL;
-
-            public string
-            to_string ()
-            {
-                switch (this)
-                {
-                    case PRIVATE:
-                        return "private";
-                    case PROTECTED:
-                        return "protected";
-                    case PUBLIC:
-                        return "public";
-                    case INTERNAL:
-                        return "internal";
-                }
-
-                return "";
-            }
-        }
-
-        [Flags]
-        public enum AccessorFlags
-        {
-            GET       = 1 << 0,
-            SET       = 1 << 1,
-            CONSTRUCT = 1 << 2,
-            DEFAULT   = 1 << 3;
-
-            public string
-            to_string (string? inDefault = null)
-            {
-                string ret = " { ";
-                if ((this & GET) == GET)
-                    ret += "get; ";
-
-                if (((this & CONSTRUCT) == CONSTRUCT) && ((this & SET) == SET))
-                    ret += "construct set; ";
-                else if (((this & CONSTRUCT) == CONSTRUCT) && ((this & SET) != SET))
-                    ret += "construct; ";
-                else if (((this & CONSTRUCT) != CONSTRUCT) && ((this & SET) == SET))
-                    ret += "set; ";
-
-                if (((this & DEFAULT) == DEFAULT) && inDefault != null)
-                    ret += "default = %s; ".printf (inDefault);
-
-                ret += "}";
-
-                return ret == " { }" ? ";" : ret;
-            }
-        }
+        // accessors
+        public abstract XCBVala.Set<Accessor> accessors { get; set; default = new XCBVala.Set<Accessor> (Accessor.compare); }
 
         // methods
         private string
@@ -106,52 +51,11 @@ namespace XCBValaCodegen
                    " */\n\n";
         }
 
-        private string
-        accessor (Visibility inVisibility, string inTypeName, string inName, AccessorFlags inFlags, string? inDefault)
+        protected void
+        register ()
         {
-            return "%s Xcb.%s %s%s\n".printf (inVisibility.to_string (), XCBVala.Root.format_vala_name (inTypeName),
-                                              inName, inFlags.to_string (inDefault));
-        }
-
-        private string
-        constructor ()
-        {
-            string ret = "";
-
-            GLib.List<unowned XCBValaCodegen.Method> methods = find_childs_of_type<XCBValaCodegen.Method> ();
-            foreach (unowned XCBValaCodegen.Method method in methods)
-            {
-                if (method.function_name == "create")
-                {
-                    ret += "\tpublic %s (Xcb.Connection inConnection".printf (XCBVala.Root.format_vala_name (name));
-                    foreach (unowned XCBVala.XmlObject child in method.childs_unsorted)
-                    {
-                        if (!(child is XCBVala.Reply))
-                        {
-                            if (child.pos != method.owner_pos)
-                            {
-                                string str = child.to_string (", ");
-                                if (str.length > 0)
-                                {
-                                    ret += str;
-                                }
-                            }
-                        }
-                    }
-                    ret += ")\n";
-                    ret += "\t{\n";
-                    ret += "\t\tGLib.Oject (connection: inConnection, xid: Xcb.%s (inConnection));\n".printf (XCBVala.Root.format_vala_name (name));
-                    ret += "\n";
-                    ret += "\t\t" + method.generate_call ();
-
-                    ret += "\t}\n";
-
-                    break;
-                }
-            }
-
-
-            return ret;
+            accessors.insert (new Accessor (Visibility.PUBLIC, "Xcb.Connection", "connection", Accessor.Flags.GET | Accessor.Flags.CONSTRUCT | Accessor.Flags.DEFAULT, "null"));
+            accessors.insert (new Accessor (Visibility.PUBLIC, "Xcb." + XCBVala.Root.format_vala_name (name), "xid", Accessor.Flags.GET | Accessor.Flags.CONSTRUCT | Accessor.Flags.DEFAULT, "0"));
         }
 
         public string
@@ -165,16 +69,31 @@ namespace XCBValaCodegen
                 derived_type = XCBVala.ValueType.get_derived ((this as XCBVala.XIDType).base_type);
             else
                 derived_type = XCBVala.ValueType.get_derived ((this as XCBVala.XIDUnion).base_type);
-            ret += "public class Xcb.Vala.%s : %s\n".printf (XCBVala.Root.format_vala_name (name), derived_type != null ? derived_type : "GLib.Object");
+            ret += "%s class Xcb.Vala.%s : %s\n".printf (visibility.to_string (), XCBVala.Root.format_vala_name (name), derived_type != null ? derived_type : "GLib.Object");
             ret += "{\n";
-            ret += "\t// accessors\n";
-            ret += "\t" + accessor (Visibility.PUBLIC, "Connection", "connection",
-                                    AccessorFlags.GET | AccessorFlags.CONSTRUCT | AccessorFlags.DEFAULT, "null");
-            ret += "\t" + accessor (Visibility.PUBLIC, name, "xid",
-                                    AccessorFlags.GET | AccessorFlags.CONSTRUCT | AccessorFlags.DEFAULT, "0");
-            ret += "\n";
-            ret += "\t// methods\n";
-            ret += constructor ();
+            if (accessors.length > 0)
+            {
+                ret += "\t// accessors\n";
+                foreach (unowned Accessor accessor in accessors)
+                {
+                    ret += "\t" + accessor.generate ();
+                }
+            }
+            GLib.List<unowned Method> methods = find_childs_of_type<Method> ();
+            methods.sort (Method.compare);
+            string m = "";
+            if (methods.length () > 0)
+            {
+                m += "\t// methods";
+                foreach (unowned Method method in methods)
+                {
+                    string str = method.generate_declaration("\t");
+                    if (str != "")
+                        m += "\n" + str;
+                }
+            }
+            if (m != "\t// methods")
+                ret += "\n" + m;
             ret += "}";
 
             return ret;

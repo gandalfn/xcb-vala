@@ -37,11 +37,15 @@ libxcb_vala_parser_la_SOURCES = \
     xid-union-type.vala \
     connection.vala \
     codegen/root.vala \
+    codegen/member.vala \
+    codegen/accessor.vala \
     codegen/object.vala \
     codegen/method.vala \
     codegen/error.vala \
     codegen/xid-type.vala \
-    codegen/xid-union.vala
+    codegen/xid-union.vala \
+    codegen/argument.vala \
+    codegen/field.vala
 
 libxcb_vala_parser_la_LIBADD = \
     $(XCB_VALA_LIBS)

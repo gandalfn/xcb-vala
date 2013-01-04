@@ -285,7 +285,7 @@ namespace XCBVala
         public abstract void
         on_child_added (XmlObject inChild);
 
-        public int
+        public virtual int
         compare (XmlObject inOther)
         {
             return GLib.strcmp (name, inOther.name);

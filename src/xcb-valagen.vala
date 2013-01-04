@@ -26,7 +26,7 @@ init ()
     XCBVala.XmlObject.register_object ("import",    typeof (XCBVala.Import));
     XCBVala.XmlObject.register_object ("xcb",       typeof (XCBValaCodegen.Root));
     XCBVala.XmlObject.register_object ("struct",    typeof (XCBVala.Class));
-    XCBVala.XmlObject.register_object ("field",     typeof (XCBVala.Field));
+    XCBVala.XmlObject.register_object ("field",     typeof (XCBValaCodegen.Field));
     XCBVala.XmlObject.register_object ("typedef",   typeof (XCBVala.Typedef));
     XCBVala.XmlObject.register_object ("xidtype",   typeof (XCBValaCodegen.XIDType));
     XCBVala.XmlObject.register_object ("xidunion",  typeof (XCBValaCodegen.XIDUnion));

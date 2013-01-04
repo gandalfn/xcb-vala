@@ -75,7 +75,7 @@ namespace XCBVala
             xid_type.name = name;
             xid_type.base_type = ext + ":" + name;
             xid_type.is_copy = true;
-            ValueType.add (ext + ":" + name, Root.format_vala_name (name), ext);
+            ValueType.add (ext + ":" + name, Root.format_vala_name (name), ext, true, true);
 
             return xid_type;
         }
@@ -101,14 +101,15 @@ namespace XCBVala
                 }
             }
 
-            ValueType.add (name, Root.format_vala_name (name), (root as Root).extension_name, true);
+            ValueType.add (name, Root.format_vala_name (name), (root as Root).extension_name, true, true);
         }
 
         public virtual string
         to_string (string inPrefix)
         {
-            string ret;
+            string ret = "";
             string cname;
+            string[] t = base_type.split(":");
 
             if (!is_copy)
             {
@@ -116,36 +117,37 @@ namespace XCBVala
             }
             else
             {
-                string[] t = base_type.split(":");
-
                 cname = Root.format_c_name (t[0], t[1]);
             }
-            ret = inPrefix + "[SimpleType, CCode (cname = \"xcb_%s_iterator_t\")]\n".printf (cname);
-            ret += inPrefix + "struct _%sIterator\n".printf (Root.format_vala_name (name));
-            ret += inPrefix + "{\n";
-            ret += inPrefix + "\tinternal int rem;\n";
-            ret += inPrefix + "\tinternal int index;\n";
-            ret += inPrefix + "\tinternal unowned %s? data;\n".printf (Root.format_vala_name (name));
-            ret += inPrefix + "}\n\n";
+            if (t[1] == null || Root.format_vala_name (name) != Root.format_vala_name (t[1]) || !ValueType.have_iterator (base_type))
+            {
+                ret += inPrefix + "[SimpleType, CCode (cname = \"xcb_%s_iterator_t\")]\n".printf (cname);
+                ret += inPrefix + "struct _%sIterator\n".printf (Root.format_vala_name (name));
+                ret += inPrefix + "{\n";
+                ret += inPrefix + "\tinternal int rem;\n";
+                ret += inPrefix + "\tinternal int index;\n";
+                ret += inPrefix + "\tinternal unowned %s? data;\n".printf (Root.format_vala_name (name));
+                ret += inPrefix + "}\n\n";
 
-            ret += inPrefix + "[CCode (cname = \"xcb_%s_iterator_t\")]\n".printf (cname);
-            ret += inPrefix + "public struct %sIterator\n".printf (Root.format_vala_name (name));
-            ret += inPrefix + "{\n";
-            ret += inPrefix + "\t[CCode (cname = \"xcb_%s_next\")]\n".printf (cname);
-            ret += inPrefix + "\tinternal void _next ();\n\n";
-            ret += inPrefix + "\tpublic inline unowned %s?\n".printf (Root.format_vala_name (name));
-            ret += inPrefix + "\tnext_value ()\n";
-            ret += inPrefix + "\t{\n";
-            ret += inPrefix + "\t\tif (((_%sIterator)this).rem > 0)\n".printf (Root.format_vala_name (name));
-            ret += inPrefix + "\t\t{\n";
-            ret += inPrefix + "\t\t\tunowned %s d = ((_%sIterator)this).data;\n".printf (Root.format_vala_name (name),
-                                                                                         Root.format_vala_name (name));
-            ret += inPrefix + "\t\t\t_next ();\n";
-            ret += inPrefix + "\t\t\treturn d;\n";
-            ret += inPrefix + "\t\t}\n";
-            ret += inPrefix + "\t\treturn null;\n";
-            ret += inPrefix + "\t}\n";
-            ret += inPrefix + "}\n\n";
+                ret += inPrefix + "[CCode (cname = \"xcb_%s_iterator_t\")]\n".printf (cname);
+                ret += inPrefix + "public struct %sIterator\n".printf (Root.format_vala_name (name));
+                ret += inPrefix + "{\n";
+                ret += inPrefix + "\t[CCode (cname = \"xcb_%s_next\")]\n".printf (cname);
+                ret += inPrefix + "\tinternal void _next ();\n\n";
+                ret += inPrefix + "\tpublic inline unowned %s?\n".printf (Root.format_vala_name (name));
+                ret += inPrefix + "\tnext_value ()\n";
+                ret += inPrefix + "\t{\n";
+                ret += inPrefix + "\t\tif (((_%sIterator)this).rem > 0)\n".printf (Root.format_vala_name (name));
+                ret += inPrefix + "\t\t{\n";
+                ret += inPrefix + "\t\t\tunowned %s d = ((_%sIterator)this).data;\n".printf (Root.format_vala_name (name),
+                                                                                             Root.format_vala_name (name));
+                ret += inPrefix + "\t\t\t_next ();\n";
+                ret += inPrefix + "\t\t\treturn d;\n";
+                ret += inPrefix + "\t\t}\n";
+                ret += inPrefix + "\t\treturn null;\n";
+                ret += inPrefix + "\t}\n";
+                ret += inPrefix + "}\n\n";
+            }
 
             ret += inPrefix + "[CCode (cname = \"xcb_%s_t\")]\n".printf (cname);
 
