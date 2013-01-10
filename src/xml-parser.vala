@@ -155,6 +155,7 @@ namespace XCBVala
             while (m_pCurrent < m_pEnd && m_pCurrent[0] != '>' && m_pCurrent[0] != '/')
             {
                 string name = read_name ();
+                skip_space ();
                 if (m_pCurrent >= m_pEnd || m_pCurrent[0] != '=')
                     throw new ParseError.PARSE ("%lu Unexpected end of element %s", m_pCurrent - m_pBegin, m_Element);
 

@@ -40,6 +40,7 @@ dnl Check for packages
 dnl ****************************************************************************
 PKG_CHECK_MODULES(XCB_VALA, [glib-2.0 >= $GLIB_REQUIRED
                              gobject-2.0 >= $GLIB_REQUIRED
+                             gio-2.0 >= $GLIB_REQUIRED
                              xcb
                              xcb-glx
                              xcb-proto
@@ -68,6 +69,7 @@ AC_SUBST(XCB_XML_PATH)
 
 AC_CONFIG_FILES([
 Makefile
+xcb/Makefile
 src/Makefile
 test/Makefile
 vapi/Makefile
