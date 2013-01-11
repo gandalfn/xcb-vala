@@ -19,9 +19,14 @@ valadoc-devhelp: $(VALADOC_SRCS)
 	$(VALADOC) -o devhelp --doclet devhelp $(VALADOC_FLAGS) $(VALADOC_SRCS) && \
 	touch $@
 
+valadoc-gtkdoc: $(VALADOC_SRCS)
+	$(AM_V_GEN) rm -rf gtkdoc; \
+	$(VALADOC) -o gtkdoc $(VALADOC_FLAGS) $(VALADOC_SRCS) && \
+	touch $@
+
 clean-local:
-	rm -rf html devhelp; \
-	rm -f valadoc-html valadoc-devhelp
+	rm -rf html devhelp gtkdoc; \
+	rm -f valadoc-html valadoc-devhelp valadoc-gtkdoc
 
 uninstall-hook:
 	rm -rf $(DESTDIR)$(datadir)/devhelp/books/xcb
@@ -31,8 +36,8 @@ install-data-hook: devhelp
 	$(INSTALL_DATA) -t $(DESTDIR)$(datadir)/devhelp/books/xcb devhelp/xcb/*.*
 	$(INSTALL_DATA) -t $(DESTDIR)$(datadir)/devhelp/books/xcb/img devhelp/xcb/img/*
 
-all-local: valadoc-html valadoc-devhelp
+all-local: valadoc-html valadoc-devhelp valadoc-gtkdoc
 
-.NOTPARALLEL: valadoc-html valadoc-devhelp
+.NOTPARALLEL: valadoc-html valadoc-devhelp valadoc-gtkdoc
 
 endif
