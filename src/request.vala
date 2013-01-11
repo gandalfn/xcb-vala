@@ -114,18 +114,24 @@ namespace XCBVala
                     {
                         m_Owner = xid_type;
                         m_OwnerPos = field.pos;
+                        if (ValueType.get_extension_name (field.attrtype) != (root as Root).extension_name)
+                            continue;
                         return true;
                     }
                 }
+                if (m_Owner != null) return true;
                 foreach (unowned XIDUnion xid_union in xid_unions)
                 {
                     if (ValueType.get (field.attrtype) == Root.format_vala_name (xid_union.name))
                     {
                         m_Owner = xid_union;
                         m_OwnerPos = field.pos;
+                        if (ValueType.get_extension_name (field.attrtype) != (root as Root).extension_name)
+                            continue;
                         return true;
                     }
                 }
+                if (m_Owner != null) return true;
             }
 
             return false;
