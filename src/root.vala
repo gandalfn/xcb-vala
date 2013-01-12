@@ -164,6 +164,8 @@ namespace XCBVala
                 return "randr";
             if (inExtensionName.down () == "xfixes")
                 return "xfixes";
+            if (inExtensionName.down () == "xvmc")
+                return "xvmc";
 
             return format_c_name (null, inExtensionName);
         }
