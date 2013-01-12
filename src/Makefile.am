@@ -35,24 +35,13 @@ libxcb_vala_parser_la_SOURCES = \
     xid-type.vala \
     xid-union.vala \
     xid-union-type.vala \
-    connection.vala \
-    codegen/root.vala \
-    codegen/member.vala \
-    codegen/accessor.vala \
-    codegen/object.vala \
-    codegen/method.vala \
-    codegen/error.vala \
-    codegen/xid-type.vala \
-    codegen/xid-union.vala \
-    codegen/argument.vala \
-    codegen/field.vala
+    connection.vala
 
 libxcb_vala_parser_la_LIBADD = \
     $(XCB_VALA_LIBS)
 
 noinst_PROGRAMS = \
-    xcb-vapigen \
-    xcb-valagen
+    xcb-vapigen
 
 xcb_vapigen_VALAFLAGS = \
     --vapidir=. \
@@ -65,26 +54,13 @@ xcb_vapigen_LDADD = \
     $(XCB_VALA_LIBS) \
     libxcb-vala-parser.la
 
-xcb_valagen_VALAFLAGS = \
-    --vapidir=. \
-    --pkg=xcb-vala-parser
-
-xcb_valagen_SOURCES = \
-    xcb-valagen.vala
-
-xcb_valagen_LDADD = \
-    $(XCB_VALA_LIBS) \
-    libxcb-vala-parser.la
-
 VALAFILES = \
     $(filter %.vala,$(xcb_vapigen_SOURCES)) \
-    $(filter %.vala,$(xcb_valagen_SOURCES)) \
     $(filter %.vala,$(libxcb_vala_parser_la_SOURCES))
 
 CLEANFILES += \
     libxcb_vala_parser_la_vala.stamp \
     xcb_vapigen_vala.stamp \
-    xcb_valagen_vala.stamp \
     $(VALAFILES:.vala=.c) \
     $(VALAFILES:.vala=.h)
 

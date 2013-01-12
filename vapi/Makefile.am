@@ -60,7 +60,7 @@ xcb-xf86dri.vapi: @XCB_XML_PATH@/xf86dri.xml
 	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
 
 xcb-xf86vidmode.vapi: @XCB_XML_PATH@/xf86vidmode.xml
-#	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
 
 xcb-xfixes.vapi: @XCB_XML_PATH@/xfixes.xml
 	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
@@ -72,7 +72,7 @@ xcb-xinput.vapi: @XCB_XML_PATH@/xinput.xml
 	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
 
 xcb-xkb.vapi: @XCB_XML_PATH@/xkb.xml
-#	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
 
 xcb-xprint.vapi: @XCB_XML_PATH@/xprint.xml
 	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
@@ -121,6 +121,7 @@ vapi_DATA = \
 	xcb-xtest.vapi \
 	xcb-xvmc.vapi \
 	xcb-xv.vapi \
+	xcb-base.deps \
 	xcb.deps \
 	xcb-bigreq.deps \
 	xcb-composite.deps \
@@ -148,10 +149,9 @@ vapi_DATA = \
 	xcb-xselinux.deps \
 	xcb-xtest.deps \
 	xcb-xv.deps \
-	xcb-xvmc.deps
-
-#	xcb-xf86vidmode.deps
-#	xcb-xkb.deps
+	xcb-xvmc.deps \
+	xcb-xf86vidmode.deps \
+	xcb-xkb.deps
 
 CLEANFILES = \
 	xcb.vapi \
@@ -214,3 +214,5 @@ CLEANFILES = \
 	xcb-xtest.deps \
 	xcb-xvmc.deps \
 	xcb-xv.deps
+
+.NOTPARALLEL: %.deps

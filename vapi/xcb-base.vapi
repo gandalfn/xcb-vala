@@ -40,6 +40,50 @@ namespace Xcb
     public const int TCP_PORT;
 
     /**
+     * Generic iterator.
+     *
+     * A generic iterator structure.
+     */
+    [Compact, CCode (cname = "xcb_generic_iterator_t", free_function = "free")]
+    public class GenericIterator
+    {
+        /**
+         * Data of the current iterator
+         */
+        public void* data;
+        /**
+         * Remaining elements
+         */
+        public int rem;
+        /**
+         * Index of the current iterator
+         */
+        public int index;
+    }
+
+    /**
+     * Generic reply.
+     *
+     * A generic reply structure.
+     */
+    [Compact, CCode (cname = "xcb_generic_reply_t", free_function = "free")]
+    public class GenericReply
+    {
+        /**
+         * Type of the response
+         */
+        public uint8 response_type;
+        /**
+         * Sequence number
+         */
+        public uint16 sequence;
+        /**
+         * Length of the response
+         */
+        public uint32 length;
+    }
+
+    /**
      * Generic error.
      *
      * A generic error class.
@@ -137,6 +181,31 @@ namespace Xcb
          */
         public uint sequence;
     }
+
+    /**
+     * NONE is the universal null resource or null atom parameter value for
+     * many core X requests
+     */
+    [CCode (cname = "XCB_NONE")]
+    public const uint8 NONE;
+
+    /**
+     * COPY_FROM_PARENT can be used for many xcb_create_window parameters
+     */
+    [CCode (cname = "XCB_COPY_FROM_PARENT")]
+    public const uint8 COPY_FROM_PARENT;
+
+    /**
+     * CURRENT_TIME can be used in most requests that take an Timestamp
+     */
+    [CCode (cname = "XCB_CURRENT_TIME")]
+    public const uint8 CURRENT_TIME;
+
+    /**
+     * NO_SYMBOL fills in unused entries in Keysym tables
+     */
+    [CCode (cname = "XCB_NO_SYMBOL")]
+    public const uint8 NO_SYMBOL;
 
     /**
      * Container for authorization information.
@@ -423,6 +492,45 @@ namespace Xcb
          */
         [CCode (cname = "xcb_discard_reply")]
         public void discard_reply(uint sequence);
+
+        [CCode (cname = "xcb_send_request", cheader_filename = "xcb/xcbext.h")]
+        public uint send_request(int flags, ref Posix.iovector vector, ProtocolRequest request);
+
+        public delegate void ReturnSocketFunc ();
+        /**
+         * Allows external code to ask XCB for permission to
+         * take over the write side of the socket and send raw data with
+         * writev. take_socket provides the sequence number of the last
+         * request XCB sent. The caller of xcb_take_socket must supply a
+         * callback which XCB can call when it wants the write side of the
+         * socket back to make a request. This callback synchronizes with the
+         * external socket owner and flushes any output queues if appropriate.
+         * If you are sending requests which won't cause a reply, please note the
+         * comment for writev which explains some sequence number wrap issues.
+         */
+        [CCode (cname = "xcb_take_socket", cheader_filename = "xcb/xcbext.h")]
+        public int take_socket(ReturnSocketFunc return_socket, int flags, out uint64 sent);
+
+        /**
+         * You must own the write-side of the socket (you've called
+         * take_socket, and haven't returned from return_socket yet) to call
+         * writev. Also, the iovec must have at least 1 byte of data in it.
+         * You have to make sure that xcb can detect sequence number wraps correctly.
+         * This means that the first request you send after take_socket must cause a
+         * reply (e.g. just insert a GetInputFocus request). After every (1 << 16) - 1
+         * requests without a reply, you have to insert a request which will cause a
+         * reply. You can again use GetInputFocus for this. You do not have to wait for
+         * any of the GetInputFocus replies, but can instead handle them via
+         * discard_reply().
+         */
+        [CCode (cname = "xcb_writev", cheader_filename = "xcb/xcbext.h")]
+        public int writev(ref Posix.iovector vector, int count, uint64 requests);
+
+        [CCode (cname = "xcb_wait_for_reply", cheader_filename = "xcb/xcbext.h")]
+        public GenericReply wait_for_reply (uint request, out GenericError error);
+
+        [CCode (cname = "xcb_poll_for_reply", cheader_filename = "xcb/xcbext.h")]
+        public int poll_for_reply (uint request, out GenericReply reply, out GenericError error);
     }
 
     /**
@@ -508,5 +616,33 @@ namespace Xcb
         }
     }
 
-    public const uint8 COPY_FROM_PARENT;
+    [CCode (cname = "xcb_extension_t", has_destroy_function = false, cheader_filename = "xcb/xcbext.h")]
+    public struct Extension
+    {
+        public string name;
+        public int global_id;
+    }
+
+    [CCode (cname = "xcb_protocol_request_t", cheader_filename = "xcb/xcbext.h")]
+    public struct ProtocolRequest
+    {
+        public size_t count;
+        public unowned Extension? ext;
+        public uint8 opcode;
+        public uint8 isvoid;
+    }
+
+    [Flags, CCode (cname = "xcb_send_request_flags_t", cprefix =  "XCB_REQUEST_", cheader_filename = "xcb/xcbext.h")]
+    public enum RequestFlags
+    {
+        CHECKED,
+        RAW,
+        DISCARD_REPLY
+    }
+
+    [CCode (cname = "xcb_popcount", cheader_filename = "xcb/xcbext.h")]
+    public static int popcount (uint32 mask);
+
+    [CCode (cname = "xcb_sumof", cheader_filename = "xcb/xcbext.h")]
+    public static int sumof(uint8[] list);
 }
