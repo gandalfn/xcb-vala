@@ -90,6 +90,9 @@ xcb-xv.vapi: @XCB_XML_PATH@/xv.xml
 	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
 
 vapi_DATA = \
+	gl.vapi \
+	glx.vapi \
+	glu.vapi \
 	xcb-base.vapi \
 	xcb.vapi \
 	xcb-bigreq.vapi \
