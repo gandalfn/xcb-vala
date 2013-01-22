@@ -382,6 +382,17 @@ namespace Xcb
         public BaseConnection.to_fd (int fd, AuthInfo? auth_info);
 
         /**
+         * Allocates an XID for a new object.
+         *
+         * Allocates an XID for a new object. Typically used just prior to
+         * various object creation functions, such as xcb_create_window.
+         *
+         * @return A newly allocated XID.
+         */
+        [CCode (cname = "xcb_generate_id")]
+        public uint32 generate_id ();
+
+        /**
          * Forces any buffered output to be written to the server.
          *
          * Forces any buffered output to be written to the server. Blocks

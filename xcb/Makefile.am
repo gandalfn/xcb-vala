@@ -17,6 +17,7 @@ libxcb_vala_la_SOURCES = \
     void-request.vala \
     error.vala \
     connection.vala \
+    xid.vala \
     proto/connection.vala \
     proto/no-operation-request.vala
 

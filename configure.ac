@@ -44,7 +44,8 @@ PKG_CHECK_MODULES(XCB_VALA, [glib-2.0 >= $GLIB_REQUIRED
                              xcb
                              xcb-glx
                              xcb-proto
-                             gl])
+                             gl
+                             libvala-0.18 >= $VALA_REQUIRED])
 AC_SUBST(XCB_VALA_CFLAGS)
 AC_SUBST(XCB_VALA_LIBS)
 
@@ -69,10 +70,12 @@ AC_SUBST(XCB_XML_PATH)
 
 AC_CONFIG_FILES([
 Makefile
-xcb/Makefile
-src/Makefile
-test/Makefile
+common/Makefile
+vapigen/Makefile
 vapi/Makefile
+test/Makefile
+codegen/Makefile
+xcb/Makefile
 doc/Makefile
 ])
 

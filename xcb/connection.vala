@@ -19,13 +19,13 @@
  *  Nicolas Bruguier <gandalfn@club-internet.fr>
  */
 
-public errordomain XCB.ConnectionError
+public errordomain XcbVala.Core.ConnectionError
 {
     INIT,
     WATCH
 }
 
-public class XCB.Core.Connection : GLib.Object
+public class XcbVala.Core.Connection : GLib.Object
 {
     // types
     internal class Cookie : GLib.Object

@@ -3,91 +3,91 @@ vapidir = $(pkgdatadir)/vapi
 %.deps: %.vapi
 
 xcb.vapi: @XCB_XML_PATH@/xproto.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-bigreq.vapi: @XCB_XML_PATH@/bigreq.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-composite.vapi: @XCB_XML_PATH@/composite.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-damage.vapi: @XCB_XML_PATH@/damage.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-dpms.vapi: @XCB_XML_PATH@/dpms.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-dri2.vapi: @XCB_XML_PATH@/dri2.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-ge.vapi: @XCB_XML_PATH@/ge.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-glx.vapi: @XCB_XML_PATH@/glx.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-randr.vapi: @XCB_XML_PATH@/randr.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-record.vapi: @XCB_XML_PATH@/record.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-render.vapi: @XCB_XML_PATH@/render.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-res.vapi: @XCB_XML_PATH@/res.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-screensaver.vapi: @XCB_XML_PATH@/screensaver.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-shape.vapi: @XCB_XML_PATH@/shape.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-shm.vapi: @XCB_XML_PATH@/shm.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-sync.vapi: @XCB_XML_PATH@/sync.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-xc_misc.vapi: @XCB_XML_PATH@/xc_misc.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-xevie.vapi: @XCB_XML_PATH@/xevie.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-xf86dri.vapi: @XCB_XML_PATH@/xf86dri.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-xf86vidmode.vapi: @XCB_XML_PATH@/xf86vidmode.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-xfixes.vapi: @XCB_XML_PATH@/xfixes.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-xinerama.vapi: @XCB_XML_PATH@/xinerama.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-xinput.vapi: @XCB_XML_PATH@/xinput.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-xkb.vapi: @XCB_XML_PATH@/xkb.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-xprint.vapi: @XCB_XML_PATH@/xprint.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-xselinux.vapi: @XCB_XML_PATH@/xselinux.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-xtest.vapi: @XCB_XML_PATH@/xtest.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-xvmc.vapi: @XCB_XML_PATH@/xvmc.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 xcb-xv.vapi: @XCB_XML_PATH@/xv.xml
-	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+	$(AM_V_GEN)${top_builddir}/vapigen/xcb-vapigen $< $@
 
 vapi_DATA = \
 	gl.vapi \

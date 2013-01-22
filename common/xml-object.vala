@@ -209,6 +209,7 @@ namespace XCBVala
                         {
                             item.set_attribute (attr.m_Name, attr.m_Value);
                         }
+                        item.on_created ();
                     }
                 }
             }
@@ -275,6 +276,14 @@ namespace XCBVala
                         return;
                 }
             }
+        }
+
+        /**
+         * Called when the object has been created and attributes set
+         */
+        public virtual void
+        on_created ()
+        {
         }
 
         /**

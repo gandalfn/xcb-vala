@@ -1,4 +1,4 @@
-SUBDIRS = src vapi xcb doc test
+SUBDIRS = common vapigen vapi codegen xcb test doc
 
 xcbvaladocdir = ${prefix}/doc/xcb-vala
 xcbvaladoc_DATA = \
