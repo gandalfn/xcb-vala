@@ -19,7 +19,7 @@
  *  Nicolas Bruguier <gandalfn@club-internet.fr>
  */
 
-internal abstract class XCB.Core.RequestArgs<Q> : GLib.Object
+internal abstract class XcbVala.Core.RequestArgs<Q> : GLib.Object
 {
     // properties
     private Q req;
@@ -31,7 +31,7 @@ internal abstract class XCB.Core.RequestArgs<Q> : GLib.Object
     }
 }
 
-internal abstract class XCB.Core.Request<Q> : GLib.Object
+internal abstract class XcbVala.Core.Request<Q> : GLib.Object
 {
     // properties
     protected Xcb.ProtocolRequest? request;

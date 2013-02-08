@@ -57,6 +57,8 @@ public class XCBVala.Codegen.Parser : Vala.CodeVisitor
         XmlObject.register_object ("xcb", typeof (Root));
         XmlObject.register_object ("xidtype", typeof (XidType));
         XmlObject.register_object ("xidunion", typeof (XidUnion));
+        XmlObject.register_object ("struct", typeof (Struct));
+        XmlObject.register_object ("field", typeof (Field));
     }
 
     public static void
@@ -208,6 +210,27 @@ public class XCBVala.Codegen.Parser : Vala.CodeVisitor
     public static Vala.Symbol
     lookup_symbol (string inName)
     {
+        switch (inName)
+        {
+            case "CARD8":
+                return s_Default.m_Context.root.scope.lookup ("uint8");
+
+            case "CARD16":
+                return s_Default.m_Context.root.scope.lookup ("uint16");
+
+            case "CARD32":
+                return s_Default.m_Context.root.scope.lookup ("uint32");
+
+            case "INT8":
+                return s_Default.m_Context.root.scope.lookup ("int8");
+
+            case "INT16":
+                return s_Default.m_Context.root.scope.lookup ("int16");
+
+            case "INT32":
+                return s_Default.m_Context.root.scope.lookup ("int32");
+        }
+
         return s_Default.m_Context.root.scope.lookup (inName);
     }
 
@@ -244,6 +267,36 @@ public class XCBVala.Codegen.Parser : Vala.CodeVisitor
         Vala.List<Vala.SourceReference>* source_stack = s_SourceStackKey.get ();
 
         source_stack->remove_at (source_stack->size - 1);
+    }
+
+    public static string
+    format_vala_name (string inName)
+    {
+        if (inName == "GCONTEXT")
+            return "GContext";
+
+        GLib.StringBuilder ret = new GLib.StringBuilder("");
+        bool is_first = true;
+        bool prev_is_lower = false;
+
+        unowned char[] s = (char[])inName;
+        for (int cpt = 0; s[cpt] != 0; ++cpt)
+        {
+            char c = s [cpt];
+            if (is_first)
+            {
+                ret.append_unichar (c.toupper ());
+                is_first = false;
+            }
+            else if (!prev_is_lower)
+                ret.append_unichar (c.tolower());
+            else
+                ret.append_unichar (c);
+
+            prev_is_lower = !is_first && c.islower ();
+        }
+
+        return ret.str;
     }
 
     // methods

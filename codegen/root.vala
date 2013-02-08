@@ -24,7 +24,7 @@ namespace XCBVala.Codegen
     public class Root : GLib.Object, XmlObject
     {
         // properties
-        private Vala.Symbol    m_SrcSymbol;
+        private Vala.Symbol    m_Symbol;
         private Set<XmlObject> m_Childs;
 
         // accessors
@@ -51,12 +51,11 @@ namespace XCBVala.Codegen
         public string extension_name  { get; set; default = null; }
         public string extension_xname { get; set; default = null; }
 
-        public Vala.Symbol src_symbol {
+        public Vala.Symbol symbol {
             get {
-                return m_SrcSymbol;
+                return m_Symbol;
             }
         }
-
 
         // methods
         construct
@@ -108,7 +107,7 @@ namespace XCBVala.Codegen
                 Parser.push (ns);
             }
 
-            m_SrcSymbol = Parser.get ();
+            m_Symbol = Parser.get ();
 
             // Add connection class
             add_connection ();
@@ -132,6 +131,12 @@ namespace XCBVala.Codegen
         to_string (string inPrefix)
         {
             return "";
+        }
+
+        public Vala.Symbol
+        lookup_symbol (string inName)
+        {
+            return m_Symbol.scope.lookup(inName);
         }
     }
 }

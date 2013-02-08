@@ -50,28 +50,7 @@ namespace XCBVala.Codegen
 
         public string class_name {
             owned get {
-                GLib.StringBuilder ret = new GLib.StringBuilder("");
-                bool is_first = true;
-                bool prev_is_lower = false;
-
-                unowned char[] s = (char[])characters;
-                for (int cpt = 0; s[cpt] != 0; ++cpt)
-                {
-                    char c = s [cpt];
-                    if (is_first)
-                    {
-                        ret.append_unichar (c.toupper ());
-                        is_first = false;
-                    }
-                    else if (!prev_is_lower)
-                        ret.append_unichar (c.tolower());
-                    else
-                        ret.append_unichar (c);
-
-                    prev_is_lower = !is_first && c.islower ();
-                }
-
-                return ret.str;
+                return Parser.format_vala_name (characters);
             }
         }
 
@@ -91,7 +70,7 @@ namespace XCBVala.Codegen
         public void
         on_end ()
         {
-            var xid_class = (root as Root).src_symbol.scope.lookup (class_name) as Vala.Class;
+            var xid_class = (root as Root).lookup_symbol (class_name) as Vala.Class;
             if (xid_class != null)
             {
                 xid_class.replace_type (xid_class.get_base_types ()[0], new Vala.ObjectType (Parser.get () as Vala.Class));

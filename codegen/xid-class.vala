@@ -26,31 +26,7 @@ namespace XCBVala.Codegen
         // accessors
         public string class_name {
             owned get {
-                if (name == "GCONTEXT")
-                    return "GContext";
-
-                GLib.StringBuilder ret = new GLib.StringBuilder("");
-                bool is_first = true;
-                bool prev_is_lower = false;
-
-                unowned char[] s = (char[])name;
-                for (int cpt = 0; s[cpt] != 0; ++cpt)
-                {
-                    char c = s [cpt];
-                    if (is_first)
-                    {
-                        ret.append_unichar (c.toupper ());
-                        is_first = false;
-                    }
-                    else if (!prev_is_lower)
-                        ret.append_unichar (c.tolower());
-                    else
-                        ret.append_unichar (c);
-
-                    prev_is_lower = !is_first && c.islower ();
-                }
-
-                return ret.str;
+               return Parser.format_vala_name (name);
             }
         }
 

@@ -18,7 +18,9 @@ xcb_codegen_SOURCES = \
     xid-class.vala \
     xid-type.vala \
     xid-union.vala \
-    xid-union-type.vala
+    xid-union-type.vala \
+    struct.vala \
+    field.vala
 
 xcb_codegen_LDADD = \
     $(XCB_VALA_LIBS) \
