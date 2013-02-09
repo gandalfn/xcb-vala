@@ -5,7 +5,8 @@ noinst_PROGRAMS = \
 	simple-drawing \
 	simple-event \
 	simple-font \
-	xcb-glx-test
+	xcb-glx-test \
+	xcb-randr
 
 simple_window_VALAFLAGS = \
 	--vapidir=${top_srcdir}/vapi \
@@ -64,12 +65,24 @@ xcb_glx_test_SOURCES = \
 xcb_glx_test_LDADD = \
 	$(XCB_VALA_LIBS) -lGLU
 
+xcb_randr_VALAFLAGS = \
+	--vapidir=${top_srcdir}/vapi \
+	--pkg=xcb-randr
+
+xcb_randr_SOURCES = \
+	xcb-randr.vala
+
+xcb_randr_LDADD = \
+	$(XCB_VALA_LIBS)
+
+
 VALAFILES = \
     $(filter %.vala,$(simple_window_SOURCES)) \
     $(filter %.vala,$(simple_drawing_SOURCES)) \
     $(filter %.vala,$(simple_event_SOURCES)) \
     $(filter %.vala,$(simple_font_SOURCES)) \
-    $(filter %.vala,$(xcb_glx_test_SOURCES))
+    $(filter %.vala,$(xcb_glx_test_SOURCES)) \
+    $(filter %.vala,$(xcb_randr_SOURCES))
 
 CLEANFILES += \
     simple_window_vala.stamp \
@@ -77,5 +90,6 @@ CLEANFILES += \
     simple_event_vala.stamp \
     simple_font_vala.stamp \
     xcb_glx_test_vala.stamp \
+    xcb_randr_vala.stamp \
     $(VALAFILES:.vala=.c) \
     $(VALAFILES:.vala=.h)

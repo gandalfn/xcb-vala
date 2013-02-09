@@ -419,7 +419,7 @@ namespace XCBVala
          * @return list of object of inType
          */
         public GLib.List<unowned T>
-        find_childs_of_type<T> ()
+        find_childs_of_type<T> (bool inRecurse = true)
         {
             GLib.List<unowned T> ret = new GLib.List<unowned T> ();
 
@@ -432,7 +432,8 @@ namespace XCBVala
                         ret.append (item);
                     }
 
-                    ret.concat (item.find_childs_of_type<T> ());
+                    if (inRecurse)
+                        ret.concat (item.find_childs_of_type<T> ());
                 }
             }
 

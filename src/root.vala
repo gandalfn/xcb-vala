@@ -166,6 +166,8 @@ namespace XCBVala
                 return "xfixes";
             if (inExtensionName.down () == "xvmc")
                 return "xvmc";
+            if (inExtensionName.down () == "screensaver")
+                return "screensaver";
 
             return format_c_name (null, inExtensionName);
         }
@@ -203,6 +205,21 @@ namespace XCBVala
         public static string
         format_c_enum_name (string? inExtensionName, string inName)
         {
+            string extension_name = null;
+            if (inExtensionName != null)
+            {
+                if (inExtensionName.down () == "randr")
+                    extension_name = "randr";
+                else if (inExtensionName.down () == "xfixes")
+                    extension_name = "xfixes";
+                else if (inExtensionName.down () == "xvmc")
+                    extension_name = "xvmc";
+                else if (inExtensionName.down () == "screensaver")
+                    extension_name = "screensaver";
+                else
+                    extension_name = inExtensionName;
+            }
+
             GLib.StringBuilder ret = new GLib.StringBuilder("");
             bool previous_is_upper = true;
 
@@ -223,7 +240,7 @@ namespace XCBVala
                 }
             }
 
-            return inExtensionName != null && inExtensionName != "proto" ? format_c_enum_name (null, inExtensionName) + "_" + ret.str : ret.str;
+            return extension_name != null && extension_name != "proto" ? format_c_enum_name (null, extension_name) + "_" + ret.str : ret.str;
         }
 
         // methods
@@ -317,7 +334,7 @@ namespace XCBVala
                 {
                     foreach (unowned Event event in events)
                     {
-                        if (event.name == event_copy.@ref)
+                        if (event.event_name == event_copy.@ref)
                         {
                             Event copy = event.copy (event_copy.name, event_copy.number);
                             remove_child (event_copy);
@@ -340,7 +357,7 @@ namespace XCBVala
                 foreach (unowned Event event in events)
                 {
                     Item item = new Item ();
-                    item.name = event.name;
+                    item.name = event.event_name;
 
                     event_enum.append_child (item);
                 }
@@ -491,6 +508,12 @@ namespace XCBVala
                 ret += inPrefix + "namespace Xcb\n";
 
             ret += inPrefix + "{\n";
+
+            if (extension_name != null)
+            {
+                ret += "\t[CCode (cname = \"xcb_%s_id\")]\n".printf (Root.format_c_extension_name (extension_name));
+                ret += "\tpublic Xcb.Extension extension;\n\n";
+            }
 
             bool nl = false;
             foreach (unowned XmlObject child in childs_unsorted)

@@ -105,7 +105,7 @@ namespace XCBVala
         {
             GLib.List<unowned XIDType> xid_types = inRoot.find_childs_of_type<XIDType> ();
             GLib.List<unowned XIDUnion> xid_unions = inRoot.find_childs_of_type<XIDUnion> ();
-            GLib.List<unowned Field> fields = find_childs_of_type<Field> ();
+            GLib.List<unowned Field> fields = find_childs_of_type<Field> (false);
             foreach (unowned Field field in fields)
             {
                 foreach (unowned XIDType xid_type in xid_types)

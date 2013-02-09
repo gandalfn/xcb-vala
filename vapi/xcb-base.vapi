@@ -393,6 +393,37 @@ namespace Xcb
         public int flush ();
 
         /**
+         * Caches reply information from QueryExtension requests.
+         *
+         * This function is the primary interface to the "extension cache",
+         * which caches reply information from QueryExtension
+         * requests. Invoking this function may cause a call to
+         * xcb_query_extension to retrieve extension information from the
+         * server, and may block until extension data is received from the
+         * server.
+         *
+         * @param ext The extension data.
+         *
+         * @return The QueryExtensionReply for the extension.
+         */
+        [CCode (cname = "xcb_get_extension_data")]
+        public unowned Xcb.QueryExtensionReply? get_extension_data(ref Extension ext);
+
+        /**
+         * Prefetch of extension data into the extension cache
+         *
+         * This function allows a "prefetch" of extension data into the
+         * extension cache. Invoking the function may cause a call to
+         * xcb_query_extension, but will not block waiting for the
+         * reply. xcb_get_extension_data will return the prefetched data after
+         * possibly blocking while it is retrieved.
+         *
+         * @param ext The extension data.
+         */
+        [CCode (cname = "xcb_prefetch_extension_data")]
+        public void prefetch_extension_data(ref Extension ext);
+
+        /**
          * Prefetch the maximum request length without blocking.
          *
          * Without blocking, does as much work as possible toward computing
