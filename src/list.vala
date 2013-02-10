@@ -125,7 +125,7 @@ namespace XCBVala
                 {
                     if (parent is Request)
                     {
-                        ret += inPrefix + "%s %s".printf (ValueType.get (attrtype), name);
+                        ret += inPrefix + "[CCode (array_length = false)]%s %s".printf (ValueType.get (attrtype), name);
                         foreach (unowned XmlObject child in childs_unsorted)
                         {
                             if (child is ValueItem)
@@ -182,7 +182,7 @@ namespace XCBVala
                         {
                             ret += inPrefix + "[CCode (cname = \"xcb_%s_%s_iterator\")]\n".printf (Root.format_c_name ((root as Root).extension_name, parent.parent.name),
                                                                                                    Root.format_c_name (null, name));
-                            ret += inPrefix + "public %sIterator Iterator ();\n".printf (ValueType.get (attrtype));
+                            ret += inPrefix + "public %sIterator iterator ();\n".printf (ValueType.get (attrtype));
                         }
                     }
                     ret += inPrefix + "[CCode (cname = \"xcb_%s_%s_length\")]\n".printf (Root.format_c_name ((root as Root).extension_name, parent.parent.name),

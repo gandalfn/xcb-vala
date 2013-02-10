@@ -79,7 +79,7 @@ namespace XCBVala
         public string
         to_string (string inPrefix)
         {
-            string ret = inPrefix + "[Compact, CCode (cname = \"xcb_%s_error_t\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
+            string ret = inPrefix + "[Compact, CCode (cname = \"xcb_%s_error_t\", has_type_id = false)]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
 
             ret += inPrefix + "public class %sError : Xcb.GenericError {\n".printf (Root.format_vala_name (name));
             foreach (unowned XmlObject child in childs_unsorted)

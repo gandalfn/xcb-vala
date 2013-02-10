@@ -99,7 +99,7 @@ namespace XCBVala
         public virtual string
         to_string (string inPrefix)
         {
-            string ret = inPrefix + "[CCode (cname = \"xcb_%s_t\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
+            string ret = inPrefix + "[CCode (cname = \"xcb_%s_t\", has_type_id = false)]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
 
             ret += inPrefix + "public struct %s : %s {\n".printf (Root.format_vala_name (name), base_type);
             foreach (unowned XmlObject child in childs_unsorted)

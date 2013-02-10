@@ -177,7 +177,7 @@ namespace XCBVala
                     else
                     {
                         int pos = m_OwnerPos;
-                        GLib.List<unowned List> lists = find_childs_of_type<List> ();
+                        GLib.List<unowned List> lists = find_childs_of_type<List> (false);
                         foreach (unowned List list in lists)
                         {
                             if (list.array_len_pos + 1 <= m_OwnerPos)
@@ -197,7 +197,7 @@ namespace XCBVala
                 bool first = true;
                 if (m_Owner != null)
                 {
-                    ret += inPrefix + "public %s %s%s (Connection connection".printf (reply, format_function_name (), suffix[cpt]);
+                    ret += inPrefix + "public %s %s%s (Xcb.Connection connection".printf (reply, format_function_name (), suffix[cpt]);
                     first = false;
                 }
                 else

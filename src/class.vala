@@ -101,7 +101,7 @@ namespace XCBVala
                 ret += inPrefix + "\t}\n";
                 ret += inPrefix + "}\n\n";
 
-                ret += inPrefix + "[CCode (cname = \"xcb_%s_t\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
+                ret += inPrefix + "[CCode (cname = \"xcb_%s_t\", has_type_id = false)]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
                 ret += inPrefix + "public struct %s {\n".printf (Root.format_vala_name (name));
             }
 

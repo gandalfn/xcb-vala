@@ -32,7 +32,6 @@ main (string[] inArgs)
             name.append_len ((string)reply.names (), reply.names_length ());
             print ("Name: %s\n", name.str);
         }
-        print ("%i %i\n",reply.crtcs_length (), reply.outputs_length ());
         for (int cpt = 0; cpt < reply.crtcs_length (); ++cpt)
         {
             Xcb.RandR.GetCrtcInfoReply info_reply = reply.crtcs ()[cpt].get_info (connection, reply.config_timestamp).reply (connection, out err);
@@ -57,7 +56,8 @@ main (string[] inArgs)
         }
         for (int cpt = 0; cpt < reply.modes_length (); ++cpt)
         {
-            print ("mode: width = %u height = %u clock = %u\n", reply.modes()[cpt].width, reply.modes()[cpt].height, reply.modes()[cpt].dot_clock);
+            uint rate = (uint)((double)reply.modes()[cpt].dot_clock / ((double)reply.modes()[cpt].htotal * (double)reply.modes()[cpt].vtotal));
+            print ("mode: %ux%u %u Hz\n", reply.modes()[cpt].width, reply.modes()[cpt].height, rate);
         }
     }
 

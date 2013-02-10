@@ -220,10 +220,14 @@ namespace XCBVala
                     extension_name = inExtensionName;
             }
 
+            string name = inName;
+            if (inName.down () == "dpmsmode")
+                name = "DpmsMode";
+
             GLib.StringBuilder ret = new GLib.StringBuilder("");
             bool previous_is_upper = true;
 
-            unowned char[] s = (char[])inName;
+            unowned char[] s = (char[])name;
             for (int cpt = 0; s[cpt] != 0; ++cpt)
             {
                 char c = s [cpt];

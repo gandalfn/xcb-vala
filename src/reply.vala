@@ -82,7 +82,7 @@ namespace XCBVala
             ret += inPrefix + "[SimpleType, CCode (cname = \"xcb_%s_cookie_t\")]\n".printf (Root.format_c_name ((root as Root).extension_name, parent.name));
             ret += inPrefix + "public struct %sCookie : VoidCookie {\n".printf (Root.format_vala_name (parent.name));
             ret += inPrefix + "\t[CCode (cname = \"xcb_%s_reply\", instance_pos = 1.1)]\n".printf (Root.format_c_name ((root as Root).extension_name, parent.name));
-            ret += inPrefix + "\tpublic %sReply reply (Connection connection, out GenericError? error = null);\n".printf (Root.format_vala_name (parent.name));
+            ret += inPrefix + "\tpublic %sReply reply (Xcb.Connection connection, out Xcb.GenericError? error = null);\n".printf (Root.format_vala_name (parent.name));
             ret += inPrefix + "}\n";
 
             return ret;

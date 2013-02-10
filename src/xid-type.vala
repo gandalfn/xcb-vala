@@ -149,7 +149,7 @@ namespace XCBVala
                 ret += inPrefix + "}\n\n";
             }
 
-            ret += inPrefix + "[CCode (cname = \"xcb_%s_t\")]\n".printf (cname);
+            ret += inPrefix + "[CCode (cname = \"xcb_%s_t\", has_type_id = false)]\n".printf (cname);
 
             string derived_type = ValueType.get_derived (base_type);
             ret += inPrefix + "public struct %s : %s {\n".printf (Root.format_vala_name (name), derived_type != null ? derived_type : "uint32");
@@ -160,7 +160,7 @@ namespace XCBVala
                 Root.format_vala_name (name) == "Font")
             {
                 ret += inPrefix + "\t[CCode (cname = \"xcb_generate_id\")]\n";
-                ret += inPrefix + "\tpublic %s (Connection connection);\n\n".printf (Root.format_vala_name (name));
+                ret += inPrefix + "\tpublic %s (Xcb.Connection connection);\n\n".printf (Root.format_vala_name (name));
             }
 
             foreach (unowned XmlObject child in childs_unsorted)
