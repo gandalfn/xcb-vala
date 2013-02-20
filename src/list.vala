@@ -182,7 +182,10 @@ namespace XCBVala
                         {
                             ret += inPrefix + "[CCode (cname = \"xcb_%s_%s_iterator\")]\n".printf (Root.format_c_name ((root as Root).extension_name, parent.parent.name),
                                                                                                    Root.format_c_name (null, name));
-                            ret += inPrefix + "public %sIterator iterator ();\n".printf (ValueType.get (attrtype));
+                            ret += inPrefix + "_%sIterator _iterator ();\n".printf (ValueType.get (attrtype));
+                            ret += inPrefix + "public %sIterator iterator () {\n".printf (ValueType.get (attrtype));
+                            ret += inPrefix + "\treturn (%sIterator) _iterator ();\n".printf (ValueType.get (attrtype));
+                            ret += inPrefix + "}\n";
                         }
                     }
                     ret += inPrefix + "[CCode (cname = \"xcb_%s_%s_length\")]\n".printf (Root.format_c_name ((root as Root).extension_name, parent.parent.name),
