@@ -31,8 +31,8 @@ main (string[] inArgs)
     unowned Xcb.Screen screen = connection.roots[0];
 
     /* Create black (foreground) graphic context */
-    Xcb.Gcontext foreground = Xcb.Gcontext (connection);
-    uint32 mask = Xcb.Gc.FOREGROUND | Xcb.Gc.GRAPHICS_EXPOSURES;
+    Xcb.GContext foreground = Xcb.GContext (connection);
+    uint32 mask = Xcb.GC.FOREGROUND | Xcb.GC.GRAPHICS_EXPOSURES;
     uint32 values[2] = { screen.black_pixel, 0 };
 
     foreground.create_gc (connection, screen.root, mask, values);

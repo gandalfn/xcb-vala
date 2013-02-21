@@ -54,6 +54,23 @@ namespace XCBVala
             XmlObject.register_object ("type", typeof (XIDUnionType));
         }
 
+        private bool
+        have_iterator ()
+        {
+            bool ret = false;
+            string[] t = base_type.split(":");
+            if (t[1] != null)
+            {
+                ret = ValueType.is_simple_type (t[1]);
+            }
+            else
+            {
+                ret = ValueType.have_iterator (t[0]) || ValueType.is_simple_type (t[0]);
+            }
+
+            return ret;
+        }
+
         public XIDType
         copy (Root inRoot)
         {
@@ -63,7 +80,7 @@ namespace XCBVala
             xid_type.name = name;
             xid_type.base_type = ext + ":" + name;
             xid_type.is_copy = true;
-            ValueType.add (ext + ":" + name, Root.format_vala_name (name), ext, true, true);
+            ValueType.add (ext + ":" + name, Root.format_vala_name (name), ext, true, have_iterator ());
 
             return xid_type;
         }
@@ -76,7 +93,7 @@ namespace XCBVala
         public void
         on_end ()
         {
-            ValueType.add (name, Root.format_vala_name (name), (root as Root).extension_name, true, true);
+            ValueType.add (name, Root.format_vala_name (name), (root as Root).extension_name, true, have_iterator ());
 
             GLib.List<unowned XIDType> xidtypes = root.find_childs_of_type<XIDType> ();
 

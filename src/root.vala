@@ -74,24 +74,33 @@ namespace XCBVala
         format_vala_name (string inName)
         {
             GLib.StringBuilder ret = new GLib.StringBuilder("");
-            bool is_first = true;
+            int is_first = 1;
             bool prev_is_lower = false;
+
+            if (inName.has_prefix ("GC"))
+            {
+                is_first = 2;
+            }
+            else if (inName.has_prefix ("XI"))
+            {
+                is_first = 3;
+            }
 
             unowned char[] s = (char[])inName;
             for (int cpt = 0; s[cpt] != 0; ++cpt)
             {
                 char c = s [cpt];
-                if (is_first)
+                if (is_first > 0)
                 {
                     ret.append_unichar (c.toupper ());
-                    is_first = false;
+                    is_first--;
                 }
                 else if (!prev_is_lower)
                     ret.append_unichar (c.tolower());
                 else
                     ret.append_unichar (c);
 
-                prev_is_lower = !is_first && c.islower ();
+                prev_is_lower = is_first <= 0 && c.islower ();
             }
 
             return ret.str;
@@ -252,18 +261,18 @@ namespace XCBVala
         {
             m_Childs = new Set<XmlObject> (XmlObject.compare);
 
-            ValueType.add ("INT8",   "int8",   extension_name, false);
-            ValueType.add ("INT16",  "int16",  extension_name, false);
-            ValueType.add ("INT32",  "int32",  extension_name, false);
-            ValueType.add ("CARD8",  "uint8",  extension_name, false);
-            ValueType.add ("CARD16", "uint16", extension_name, false);
-            ValueType.add ("CARD32", "uint32", extension_name, false);
-            ValueType.add ("BYTE",   "uint8",  extension_name, false);
-            ValueType.add ("BOOL",   "bool",   extension_name, false);
-            ValueType.add ("char",   "char",   extension_name, false);
-            ValueType.add ("float",  "float",  extension_name, false);
-            ValueType.add ("double", "double", extension_name, false);
-            ValueType.add ("void",   "void",   extension_name, false);
+            ValueType.add_simple ("INT8",   "int8",   extension_name);
+            ValueType.add_simple ("INT16",  "int16",  extension_name);
+            ValueType.add_simple ("INT32",  "int32",  extension_name);
+            ValueType.add_simple ("CARD8",  "uint8",  extension_name);
+            ValueType.add_simple ("CARD16", "uint16", extension_name);
+            ValueType.add_simple ("CARD32", "uint32", extension_name);
+            ValueType.add_simple ("BYTE",   "uint8",  extension_name);
+            ValueType.add_simple ("BOOL",   "bool",   extension_name);
+            ValueType.add_simple ("char",   "char",   extension_name);
+            ValueType.add_simple ("float",  "float",  extension_name);
+            ValueType.add_simple ("double", "double", extension_name);
+            ValueType.add_simple ("void",   "void",   extension_name);
         }
 
         private void

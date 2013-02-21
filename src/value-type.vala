@@ -30,6 +30,7 @@ namespace XCBVala
         private string m_Name;
         private string m_Val;
         private string m_ExtensionName;
+        private bool   m_IsSimpleType;
         private bool   m_IsXIDType;
         private bool   m_HaveIterator;
 
@@ -37,7 +38,14 @@ namespace XCBVala
         public static void
         add (string inName, string inVal, string? inExtensionName, bool inIsXIDType, bool inHaveIterator = false)
         {
-            ValueType val = new ValueType (inName, inVal, inExtensionName, inIsXIDType, inHaveIterator);
+            ValueType val = new ValueType (inName, inVal, inExtensionName, false, inIsXIDType, inHaveIterator);
+            s_Types.insert (val);
+        }
+
+        public static void
+        add_simple (string inName, string inVal, string? inExtensionName)
+        {
+            ValueType val = new ValueType (inName, inVal, inExtensionName, true, false, false);
             s_Types.insert (val);
         }
 
@@ -85,6 +93,21 @@ namespace XCBVala
             }
 
             return null;
+        }
+
+        public static bool
+        is_simple_type (string inName)
+        {
+            unowned ValueType? val = s_Types.search<string> (inName, (o, v) => {
+                return o.m_Name.ascii_casecmp (v);
+            });
+
+            if (val != null)
+            {
+                return val.m_IsSimpleType;
+            }
+
+            return false;
         }
 
         public static bool
@@ -138,11 +161,12 @@ namespace XCBVala
             s_Types = new Set<ValueType> (ValueType.compare);
         }
 
-        private ValueType (string inName, string inVal, string? inExtensionName, bool inIsXIDType, bool inHaveIterator = false)
+        private ValueType (string inName, string inVal, string? inExtensionName, bool inIsSimpleType, bool inIsXIDType, bool inHaveIterator)
         {
             m_Name = inName;
             m_Val = inVal;
             m_ExtensionName = inExtensionName;
+            m_IsSimpleType = inIsSimpleType;
             m_IsXIDType = inIsXIDType;
             m_HaveIterator = inHaveIterator;
         }

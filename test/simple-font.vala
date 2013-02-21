@@ -9,7 +9,7 @@ test_cookie (Xcb.VoidCookie cookie, Xcb.Connection connection, string err_messag
     }
 }
 
-static Xcb.Gcontext
+static Xcb.GContext
 get_font_gc (Xcb.Connection connection, Xcb.Screen screen, Xcb.Window window, string font_name)
 {
     /* get font */
@@ -19,8 +19,8 @@ get_font_gc (Xcb.Connection connection, Xcb.Screen screen, Xcb.Window window, st
     test_cookie(font_cookie, connection, "can't open font");
 
     /* create graphics context */
-    Xcb.Gcontext    gc            = Xcb.Gcontext (connection);
-    int32           mask          = Xcb.Gc.FOREGROUND | Xcb.Gc.BACKGROUND | Xcb.Gc.FONT;
+    Xcb.GContext    gc            = Xcb.GContext (connection);
+    int32           mask          = Xcb.GC.FOREGROUND | Xcb.GC.BACKGROUND | Xcb.GC.FONT;
     uint32[]        value_list    = { screen.black_pixel, screen.white_pixel, font };
 
     Xcb.VoidCookie gc_cookie = gc.create_gc_checked (connection, window, mask, value_list );
@@ -41,7 +41,7 @@ draw_text (Xcb.Connection connection, Xcb.Screen screen, Xcb.Window window,
           int16 x1, int16 y1, string label )
 {
     /* get graphics context */
-    Xcb.Gcontext gc = get_font_gc (connection, screen, window, "7x13");
+    Xcb.GContext gc = get_font_gc (connection, screen, window, "7x13");
 
     /* draw the text */
     Xcb.VoidCookie text_cookie = window.image_text_8_checked (connection, gc,

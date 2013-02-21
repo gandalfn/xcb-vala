@@ -44,7 +44,7 @@ namespace XCBVala
         public string name           { get; set; default = null; }
         public int    pos            { get; set; default = 0; }
         public string characters     { get; set; default = null; }
-        public string base_type      { get; set; default = "uint32"; }
+        public string base_type      { get; set; default = "CARD32"; }
         public bool   is_copy        { get; set; default = false; }
 
         // methods
@@ -52,6 +52,7 @@ namespace XCBVala
         {
             m_Childs = new Set<XmlObject> (XmlObject.compare);
         }
+
         private bool
         have_create_request ()
         {
@@ -66,6 +67,19 @@ namespace XCBVala
             return false;
         }
 
+        private bool
+        have_iterator ()
+        {
+            bool ret = true;
+            string[] t = base_type.split(":");
+            if (t[1] != null)
+            {
+                ret = t[1].down () != name.down ();
+            }
+
+            return ret;
+        }
+
         public XIDType
         copy (Root inRoot)
         {
@@ -75,7 +89,7 @@ namespace XCBVala
             xid_type.name = name;
             xid_type.base_type = ext + ":" + name;
             xid_type.is_copy = true;
-            ValueType.add (ext + ":" + name, Root.format_vala_name (name), ext, true, true);
+            ValueType.add (ext + ":" + name, Root.format_vala_name (name), ext, true, have_iterator ());
 
             return xid_type;
         }
@@ -101,7 +115,7 @@ namespace XCBVala
                 }
             }
 
-            ValueType.add (name, Root.format_vala_name (name), (root as Root).extension_name, true, true);
+            ValueType.add (name, Root.format_vala_name (name), (root as Root).extension_name, true, have_iterator ());
         }
 
         public virtual string
@@ -119,10 +133,10 @@ namespace XCBVala
             {
                 cname = Root.format_c_name (t[0], t[1]);
             }
-            if (t[1] == null || Root.format_vala_name (name) != Root.format_vala_name (t[1]) || !ValueType.have_iterator (base_type))
+            if (have_iterator ())
             {
                 ret += inPrefix + "[SimpleType, CCode (cname = \"xcb_%s_iterator_t\")]\n".printf (cname);
-                ret += inPrefix + "struct _%sIterator\n".printf (Root.format_vala_name (name));
+                ret += inPrefix + "public struct _%sIterator\n".printf (Root.format_vala_name (name));
                 ret += inPrefix + "{\n";
                 ret += inPrefix + "\tinternal int rem;\n";
                 ret += inPrefix + "\tinternal int index;\n";
@@ -139,7 +153,7 @@ namespace XCBVala
                 ret += inPrefix + "\t{\n";
                 ret += inPrefix + "\t\tif (((_%sIterator)this).rem > 0)\n".printf (Root.format_vala_name (name));
                 ret += inPrefix + "\t\t{\n";
-                ret += inPrefix + "\t\t\tunowned %s d = ((_%sIterator)this).data;\n".printf (Root.format_vala_name (name),
+                ret += inPrefix + "\t\t\tunowned %s? d = ((_%sIterator)this).data;\n".printf (Root.format_vala_name (name),
                                                                                              Root.format_vala_name (name));
                 ret += inPrefix + "\t\t\t_next ();\n";
                 ret += inPrefix + "\t\t\treturn d;\n";
@@ -156,7 +170,7 @@ namespace XCBVala
 
 
             if (have_create_request ()                     ||
-                Root.format_vala_name (name) == "Gcontext" ||
+                Root.format_vala_name (name) == "GContext" ||
                 Root.format_vala_name (name) == "Font")
             {
                 ret += inPrefix + "\t[CCode (cname = \"xcb_generate_id\")]\n";

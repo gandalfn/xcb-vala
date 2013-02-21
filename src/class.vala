@@ -75,7 +75,7 @@ namespace XCBVala
             else
             {
                 ret = inPrefix + "[SimpleType, CCode (cname = \"xcb_%s_iterator_t\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
-                ret += inPrefix + "struct _%sIterator\n".printf (Root.format_vala_name (name));
+                ret += inPrefix + "public struct _%sIterator\n".printf (Root.format_vala_name (name));
                 ret += inPrefix + "{\n";
                 ret += inPrefix + "\tinternal int rem;\n";
                 ret += inPrefix + "\tinternal int index;\n";
@@ -92,8 +92,8 @@ namespace XCBVala
                 ret += inPrefix + "\t{\n";
                 ret += inPrefix + "\t\tif (((_%sIterator)this).rem > 0)\n".printf (Root.format_vala_name (name));
                 ret += inPrefix + "\t\t{\n";
-                ret += inPrefix + "\t\t\tunowned %s d = ((_%sIterator)this).data;\n".printf (Root.format_vala_name (name),
-                                                                                             Root.format_vala_name (name));
+                ret += inPrefix + "\t\t\tunowned %s? d = ((_%sIterator)this).data;\n".printf (Root.format_vala_name (name),
+                                                                                              Root.format_vala_name (name));
                 ret += inPrefix + "\t\t\t_next ();\n";
                 ret += inPrefix + "\t\t\treturn d;\n";
                 ret += inPrefix + "\t\t}\n";
