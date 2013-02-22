@@ -18,7 +18,7 @@ libxcb_vala_parser_la_SOURCES = \
     root.vala \
     request.vala \
     reply.vala \
-    class.vala \
+    struct.vala \
     event.vala \
     event-copy.vala \
     error.vala \

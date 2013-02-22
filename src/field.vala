@@ -63,7 +63,7 @@ namespace XCBVala
         public string
         to_string (string inPrefix)
         {
-            if (parent != null && (parent is Class || !is_ref))
+            if (parent != null && (parent is Struct || !is_ref))
             {
                 if (attrtype != null && ValueType.get (attrtype) != null)
                 {

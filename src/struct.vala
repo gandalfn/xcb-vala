@@ -21,7 +21,7 @@
 
 namespace XCBVala
 {
-    public class Class : GLib.Object, XmlObject
+    public class Struct : GLib.Object, XmlObject
     {
         // properties
         private Set<XmlObject> m_Childs;
