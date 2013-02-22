@@ -60,7 +60,7 @@ glx_choose_fb_configs (Xcb.Connection connection, int screen_num, uint32[] attri
         Posix.exit (-1);
     }
 
-    unowned uint32[] prop_list = reply.property_list ();
+    unowned uint32[] prop_list = reply.property_list;
     uint32* fbconfig_line   = (uint32*)prop_list;
     uint32  fbconfig_linesz = reply.num_properties * 2; // *2 since each line contains also values
 

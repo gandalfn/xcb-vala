@@ -75,7 +75,7 @@ namespace XCBVala
             else
             {
                 ret = inPrefix + "[SimpleType, CCode (cname = \"xcb_%s_iterator_t\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
-                ret += inPrefix + "public struct _%sIterator\n".printf (Root.format_vala_name (name));
+                ret += inPrefix + "struct _%sIterator\n".printf (Root.format_vala_name (name));
                 ret += inPrefix + "{\n";
                 ret += inPrefix + "\tinternal int rem;\n";
                 ret += inPrefix + "\tinternal int index;\n";

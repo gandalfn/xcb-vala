@@ -60,6 +60,44 @@ namespace XCBVala
             m_Childs = new Set<XmlObject> (XmlObject.compare);
         }
 
+        private string
+        generate_accessor (string inPrefix, string inAttrType, string inParentName, string inName)
+        {
+            string ret = "";
+            string cname = Root.format_c_name (null, inName);
+            string cparentname = Root.format_c_name ((root as Root).extension_name, inParentName);
+            string ctype = ValueType.get (inAttrType);
+
+            if (ctype.down () == "char" || (cname == "name" && ctype.down () == "uint8"))
+            {
+                ret += inPrefix + "[CCode (cname = \"xcb_%s_%s_length\")]\n".printf (cparentname, cname);
+                ret += inPrefix + "int _%s_length ();\n".printf (cname);
+                ret += inPrefix + "[CCode (cname = \"xcb_%s_%s\", array_length = false)]\n".printf (cparentname, cname);
+                ret += inPrefix + "unowned %s[] _%s ();\n".printf (ctype, cname);
+                ret += inPrefix + "public string %s {\n".printf (cname);
+                ret += inPrefix + "\towned get {\n";
+                ret += inPrefix + "\t\tGLib.StringBuilder ret = new GLib.StringBuilder ();\n";
+                ret += inPrefix + "\t\tret.append_len ((string)_%s (), _%s_length ());\n".printf (cname, cname);
+                ret += inPrefix + "\t\treturn ret.str;\n";
+                ret += inPrefix + "\t}\n";
+                ret += inPrefix + "}\n";
+            }
+            else
+            {
+                ret += inPrefix + "public int %s_length {\n".printf (cname);
+                ret += inPrefix + "\t[CCode (cname = \"xcb_%s_%s_length\")]\n".printf (cparentname, cname);
+                ret += inPrefix + "\tget;\n";
+                ret += inPrefix + "}\n";
+                ret += inPrefix + "[CCode (array_length = false)]\n";
+                ret += inPrefix + "public unowned %s[] %s {\n".printf (ctype, cname);
+                ret += inPrefix + "\t[CCode (cname = \"xcb_%s_%s\")]\n".printf (cparentname, cname);
+                ret += inPrefix + "\tget;\n";
+                ret += inPrefix + "}\n";
+            }
+
+            return ret;
+        }
+
         public void
         on_child_added (XmlObject inChild)
         {
@@ -117,8 +155,7 @@ namespace XCBVala
                     }
                     else
                     {
-                        ret += inPrefix + "[CCode (array_length_cname = \"%s\")]\n".printf (field_ref);
-                        ret += inPrefix + "public %s[] %s;\n".printf (ValueType.get (attrtype), name);
+                        ret += generate_accessor (inPrefix, attrtype, parent.name, name);
                     }
                 }
                 else if (childs.length == 1)
@@ -188,12 +225,7 @@ namespace XCBVala
                             ret += inPrefix + "}\n";
                         }
                     }
-                    ret += inPrefix + "[CCode (cname = \"xcb_%s_%s_length\")]\n".printf (Root.format_c_name ((root as Root).extension_name, parent.parent.name),
-                                                                                         Root.format_c_name (null, name));
-                    ret += inPrefix + "public int %s_length ();\n".printf (Root.format_c_name (null, name));
-                    ret += inPrefix + "[CCode (cname = \"xcb_%s_%s\", array_length = false)]\n".printf (Root.format_c_name ((root as Root).extension_name, parent.parent.name),
-                                                                                                        Root.format_c_name (null, name));
-                    ret += inPrefix + "public unowned %s[] %s ();\n".printf (ValueType.get (attrtype), Root.format_c_name (null, name));
+                    ret += generate_accessor (inPrefix, attrtype, parent.parent.name, name);
                 }
             }
             else
