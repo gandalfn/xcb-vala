@@ -14,6 +14,10 @@ libxcb_vala_parser_la_SOURCES = \
     xml-parser.vala \
     xml-object.vala \
     value-type.vala \
+    doc.vala \
+    brief.vala \
+    description.vala \
+    see.vala \
     import.vala \
     root.vala \
     request.vala \
@@ -30,6 +34,9 @@ libxcb_vala_parser_la_SOURCES = \
     typedef.vala \
     union.vala \
     list.vala \
+    op.vala \
+    bitcase.vala \
+    switch.vala \
     value-item.vala \
     value-param.vala \
     xid-type.vala \

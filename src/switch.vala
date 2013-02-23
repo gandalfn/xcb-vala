@@ -1,4 +1,4 @@
-/* field.vala
+/* switch.vala
  *
  * Copyright (C) 2012  Nicolas Bruguier
  *
@@ -21,15 +21,16 @@
 
 namespace XCBVala
 {
-    public class Field : GLib.Object, XmlObject
+    public class Switch : GLib.Object, XmlObject
     {
         // properties
         private Set<XmlObject> m_Childs;
+        private char           m_Generic;
 
         // accessors
         protected string tag_name {
             get {
-                return "field";
+                return "switch";
             }
         }
 
@@ -43,13 +44,21 @@ namespace XCBVala
 
         public string name           { get; set; default = null; }
         public int    pos            { get; set; default = 0; }
-        public string attrtype       { get; set; default = null; }
         public string characters     { get; set; default = null; }
-        public string mask           { get; set; default = null; }
-        public string @enum          { get; set; default = null; }
-        public bool   is_ref         { get; set; default = false; }
+        public bool   first_bitcase  { get; set; default = true; }
+
+        public char generic_name {
+            get {
+                return m_Generic;
+            }
+        }
 
         // methods
+        construct
+        {
+            m_Childs = new Set<XmlObject> (XmlObject.compare);
+        }
+
         public void
         on_child_added (XmlObject inChild)
         {
@@ -58,25 +67,43 @@ namespace XCBVala
         public void
         on_end ()
         {
+            if (parent is Request)
+            {
+                m_Generic = (parent as Request).add_generic ();
+            }
         }
 
         public string
         to_string (string inPrefix)
         {
-            if (parent != null && (!(parent is Request) || !is_ref))
+            string ret = "";
+
+            first_bitcase = true;
+            if (parent is Request)
             {
-                if (attrtype != null && ValueType.get (attrtype) != null)
+                foreach (unowned XmlObject child in childs_unsorted)
                 {
-                    if (parent is Request)
-                        return inPrefix + "%s %s".printf (ValueType.get (attrtype), name);
-                    else
-                        return inPrefix + "public %s %s;\n".printf (ValueType.get (attrtype), name);
+                    if (child is Bitcase)
+                    {
+                        ret += child.to_string (", ");
+                        first_bitcase = false;
+                        break;
+                    }
                 }
-                else
-                    warning ("Type %s of %s not found", attrtype, name);
+            }
+            else if (parent is Reply)
+            {
+                foreach (unowned XmlObject child in childs_unsorted)
+                {
+                    if (child is Bitcase)
+                    {
+                        ret += child.to_string (inPrefix);
+                        first_bitcase = false;
+                    }
+                }
             }
 
-            return "";
+            return ret;
         }
     }
 }

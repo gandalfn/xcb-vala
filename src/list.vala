@@ -47,6 +47,7 @@ namespace XCBVala
         public string attrtype       { get; set; default = null; }
         public string characters     { get; set; default = null; }
         public string field_ref      { get; set; default = null; }
+        public char   generic_name   { get; set; default = -1; }
 
         public int array_len_pos {
             get {
@@ -61,12 +62,47 @@ namespace XCBVala
         }
 
         private string
-        generate_accessor (string inPrefix, string inAttrType, string inParentName, string inName)
+        attrtype_valuetype ()
+        {
+            return generic_name != -1 ? "%c".printf (generic_name) : ValueType.get (attrtype);
+        }
+
+        private string
+        generate_switch_accessor (string inPrefix)
         {
             string ret = "";
-            string cname = Root.format_c_name (null, inName);
+            string cname = Root.format_c_name (null, name);
+            string cswitchname = Root.format_c_name (null, parent.parent.name);
+            string cparentname = Root.format_c_name ((root as Root).extension_name, parent.parent.parent.parent.name);
+            string ctype = attrtype_valuetype ();
+
+            if ((parent.parent as Switch).first_bitcase)
+            {
+                ret += inPrefix + "[CCode (array_length = false)]\n";
+                ret += inPrefix + "public unowned void[] %s {\n".printf (cswitchname);
+                ret += inPrefix + "\t[CCode (cname = \"xcb_%s_%s\")]\n".printf (cparentname, cswitchname);
+                ret += inPrefix + "\tget;\n";
+                ret += inPrefix + "}\n";
+            }
+
+            ret += inPrefix + "[CCode (cname = \"xcb_%s_%s_%s_length\")]\n".printf (cparentname, cswitchname, cname);
+            ret += inPrefix + "public int %s_%s_length ([CCode (array_length = false)]void[] %s);\n".printf (cswitchname, cname, cswitchname);
+            ret += inPrefix + "[CCode (array_length = false)]\n";
+            ret += inPrefix + "public unowned %s[] %s_%s {\n".printf (ctype, cswitchname, cname);
+            ret += inPrefix + "\t[CCode (cname = \"xcb_%s_%s\")]\n".printf (cparentname, cswitchname);
+            ret += inPrefix + "\tget;\n";
+            ret += inPrefix + "}\n";
+
+            return ret;
+        }
+
+        private string
+        generate_accessor (string inPrefix, string inParentName)
+        {
+            string ret = "";
+            string cname = Root.format_c_name (null, name);
             string cparentname = Root.format_c_name ((root as Root).extension_name, inParentName);
-            string ctype = ValueType.get (inAttrType);
+            string ctype = attrtype_valuetype ();
 
             if (ctype.down () == "char" || (cname == "name" && ctype.down () == "uint8"))
             {
@@ -106,21 +142,28 @@ namespace XCBVala
         public void
         on_end ()
         {
-            foreach (unowned XmlObject item in this)
+            GLib.List<unowned FieldRef> fieldrefs = find_childs_of_type<FieldRef> ();
+            foreach (unowned FieldRef fieldref in fieldrefs)
             {
-                if (item is FieldRef && parent != null)
+                if (parent != null)
                 {
-                    foreach (unowned XmlObject child in parent)
+                    unowned XmlObject p = parent;
+                    if (parent is Bitcase)
                     {
-                        if ((child is Field) && item.characters == child.name)
+                        p = parent.parent.parent;
+                    }
+
+                    foreach (unowned XmlObject child in p)
+                    {
+                        if ((child is Field) && fieldref.characters == child.name)
                         {
                             (child as Field).is_ref = true;
-                            field_ref = item.characters;
-                            if (parent is Request)
+                            field_ref = fieldref.characters;
+                            if (p is Request)
                             {
                                 m_ArrayLenPos = child.pos;
                             }
-                            break;
+                            return;
                         }
                     }
                 }
@@ -131,51 +174,57 @@ namespace XCBVala
         to_string (string inPrefix)
         {
             string ret = "";
-            if (attrtype != null && ValueType.get (attrtype) != null)
+            if (attrtype != null && attrtype_valuetype () != null)
             {
                 bool is_reply = false;
 
+                unowned XmlObject p = parent;
+                if (parent is Bitcase)
+                {
+                    p = parent.parent.parent;
+                }
+
                 if (field_ref != null)
                 {
-                    if (parent is Request)
+                    if (p is Request)
                     {
                         if (m_ArrayLenPos >= 0)
                         {
                             int pos = m_ArrayLenPos + 1;
-                            if ((parent as Request).owner_pos <= m_ArrayLenPos)
+                            if ((p as Request).owner_pos <= m_ArrayLenPos)
                                 pos = int.max (m_ArrayLenPos, 1);
                             ret += inPrefix +  "[CCode (array_length_pos = %i.%i)]".printf (pos, m_ArrayLenPos + 1);
                         }
 
-                        ret += "%s[] %s".printf (ValueType.get (attrtype), name);
+                        ret += "%s[] %s".printf (attrtype_valuetype (), name);
                     }
-                    else if (parent is Reply)
+                    else if (p is Reply)
                     {
                         is_reply = true;
                     }
                     else
                     {
-                        ret += generate_accessor (inPrefix, attrtype, parent.name, name);
+                        ret += generate_accessor (inPrefix, p.name);
                     }
                 }
                 else if (childs.length == 1)
                 {
-                    if (parent is Request)
+                    if (p is Request)
                     {
-                        ret += inPrefix + "[CCode (array_length = false)]%s %s".printf (ValueType.get (attrtype), name);
+                        ret += inPrefix + "[CCode (array_length = false)]%s %s".printf (attrtype_valuetype (), name);
                         foreach (unowned XmlObject child in childs_unsorted)
                         {
                             if (child is ValueItem)
                                 ret += "[%i]".printf (int.parse (child.characters));
                         }
                     }
-                    else if (parent is Reply)
+                    else if (p is Reply)
                     {
                         is_reply = true;
                     }
                     else
                     {
-                        ret += inPrefix + "public %s %s".printf (ValueType.get (attrtype), name);
+                        ret += inPrefix + "public %s %s".printf (attrtype_valuetype (), name);
                         foreach (unowned XmlObject child in childs_unsorted)
                         {
                             if (child is ValueItem)
@@ -186,46 +235,53 @@ namespace XCBVala
                 }
                 else
                 {
-                    if (parent is Request)
+                    if (p is Request)
                     {
                         ret += inPrefix + "[CCode (array_length_pos = %i.%i)]".printf (pos, pos);
-                        ret += "%s[] %s".printf (ValueType.get (attrtype), name);
+                        ret += "%s[] %s".printf (attrtype_valuetype (), name);
                     }
-                    else if (parent is Reply)
+                    else if (p is Reply)
                     {
                         is_reply = true;
                     }
                     else
                     {
                         ret += inPrefix + "[CCode (array_length = false)]\n";
-                        ret += inPrefix + "public %s[] %s;\n".printf (ValueType.get (attrtype), name);
+                        ret += inPrefix + "public %s[] %s;\n".printf (attrtype_valuetype (), name);
                     }
                 }
 
                 if (is_reply)
                 {
-                    if (ValueType.have_iterator (attrtype))
+                    if (!(parent is Bitcase))
                     {
-                        GLib.List<unowned List> lists = parent.find_childs_of_type<List> ();
-                        int cpt_iterator = 0;
-                        foreach (unowned List list in lists)
+                        if (ValueType.have_iterator (attrtype))
                         {
-                            if (ValueType.have_iterator (list.attrtype))
+                            GLib.List<unowned List> lists = p.find_childs_of_type<List> ();
+                            int cpt_iterator = 0;
+                            foreach (unowned List list in lists)
                             {
-                                cpt_iterator++;
+                                if (ValueType.have_iterator (list.attrtype))
+                                {
+                                    cpt_iterator++;
+                                }
+                            }
+                            if (cpt_iterator == 1)
+                            {
+                                ret += inPrefix + "[CCode (cname = \"xcb_%s_%s_iterator\")]\n".printf (Root.format_c_name ((root as Root).extension_name, p.parent.name),
+                                                                                                       Root.format_c_name (null, name));
+                                ret += inPrefix + "_%sIterator _iterator ();\n".printf (attrtype_valuetype ());
+                                ret += inPrefix + "public %sIterator iterator () {\n".printf (attrtype_valuetype ());
+                                ret += inPrefix + "\treturn (%sIterator) _iterator ();\n".printf (attrtype_valuetype ());
+                                ret += inPrefix + "}\n";
                             }
                         }
-                        if (cpt_iterator == 1)
-                        {
-                            ret += inPrefix + "[CCode (cname = \"xcb_%s_%s_iterator\")]\n".printf (Root.format_c_name ((root as Root).extension_name, parent.parent.name),
-                                                                                                   Root.format_c_name (null, name));
-                            ret += inPrefix + "_%sIterator _iterator ();\n".printf (ValueType.get (attrtype));
-                            ret += inPrefix + "public %sIterator iterator () {\n".printf (ValueType.get (attrtype));
-                            ret += inPrefix + "\treturn (%sIterator) _iterator ();\n".printf (ValueType.get (attrtype));
-                            ret += inPrefix + "}\n";
-                        }
+                        ret += generate_accessor (inPrefix, p.parent.name);
                     }
-                    ret += generate_accessor (inPrefix, attrtype, parent.parent.name, name);
+                    else
+                    {
+                        ret += generate_switch_accessor (inPrefix);
+                    }
                 }
             }
             else

@@ -27,6 +27,7 @@ namespace XCBVala
         private string         m_Name = null;
         private string         m_EventName;
         private Set<XmlObject> m_Childs;
+        private unowned Doc?   m_Doc = null;
 
         // accessors
         protected string tag_name {
@@ -86,6 +87,10 @@ namespace XCBVala
         public void
         on_child_added (XmlObject inChild)
         {
+            if (inChild is Doc)
+            {
+                m_Doc = inChild as Doc;
+            }
         }
 
         public void
@@ -96,12 +101,24 @@ namespace XCBVala
         public string
         to_string (string inPrefix)
         {
-            string ret = inPrefix + "[Compact, CCode (cname = \"xcb_%s_event_t\", has_type_id = false)]\n".printf (Root.format_c_name ((root as Root).extension_name, m_Name));
+            string ret = "";
 
+            if (m_Doc != null)
+            {
+                ret += m_Doc.to_string (inPrefix);
+            }
+            ret += inPrefix + "[Compact, CCode (cname = \"xcb_%s_event_t\", has_type_id = false)]\n".printf (Root.format_c_name ((root as Root).extension_name, m_Name));
             ret += inPrefix + "public class %sEvent : GenericEvent {\n".printf (Root.format_vala_name (m_Name));
             foreach (unowned XmlObject child in childs_unsorted)
             {
-                ret += child.to_string (inPrefix + "\t");
+                if (!(child is Doc))
+                {
+                    if (m_Doc != null)
+                    {
+                        ret += m_Doc.field_to_string (child.name, inPrefix + "\t");
+                    }
+                    ret += child.to_string (inPrefix + "\t");
+                }
             }
             ret += inPrefix + "}\n";
 

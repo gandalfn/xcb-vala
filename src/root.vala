@@ -403,10 +403,10 @@ namespace XCBVala
         public void
         update_requests ()
         {
-            GLib.List<unowned Request> requests = find_childs_of_type<unowned Request> ();
+            GLib.List<unowned Request> requests = find_childs_of_type<unowned Request> (false);
             foreach (unowned Request request in requests)
             {
-                if (request.owner != null)
+                if (request.owner != null || request.search_owner (this))
                 {
                     request.owner.reparent (request);
                 }
@@ -416,9 +416,7 @@ namespace XCBVala
                     {
                         if (request.search_owner (import))
                         {
-                            unowned XmlObject? found = childs.search<string> (request.owner.name, (o, v) => {
-                                return GLib.strcmp (o.name, v);
-                            });
+                            unowned XmlObject? found = childs.search<string> (request.owner.name, XmlObject.compare_with_name);
 
                             if (found == null)
                             {

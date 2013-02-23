@@ -1,4 +1,4 @@
-/* field.vala
+/* op.vala
  *
  * Copyright (C) 2012  Nicolas Bruguier
  *
@@ -21,15 +21,18 @@
 
 namespace XCBVala
 {
-    public class Field : GLib.Object, XmlObject
+    public class OP : GLib.Object, XmlObject
     {
+        // static properties
+        private static ulong s_Count = 0;
+
         // properties
         private Set<XmlObject> m_Childs;
 
         // accessors
         protected string tag_name {
             get {
-                return "field";
+                return "op";
             }
         }
 
@@ -43,13 +46,16 @@ namespace XCBVala
 
         public string name           { get; set; default = null; }
         public int    pos            { get; set; default = 0; }
-        public string attrtype       { get; set; default = null; }
         public string characters     { get; set; default = null; }
-        public string mask           { get; set; default = null; }
-        public string @enum          { get; set; default = null; }
-        public bool   is_ref         { get; set; default = false; }
 
         // methods
+        construct
+        {
+            m_Childs = new Set<XmlObject> (XmlObject.compare);
+            s_Count++;
+            name = "op-%lu".printf (s_Count);
+        }
+
         public void
         on_child_added (XmlObject inChild)
         {
@@ -63,20 +69,19 @@ namespace XCBVala
         public string
         to_string (string inPrefix)
         {
-            if (parent != null && (!(parent is Request) || !is_ref))
-            {
-                if (attrtype != null && ValueType.get (attrtype) != null)
-                {
-                    if (parent is Request)
-                        return inPrefix + "%s %s".printf (ValueType.get (attrtype), name);
-                    else
-                        return inPrefix + "public %s %s;\n".printf (ValueType.get (attrtype), name);
-                }
-                else
-                    warning ("Type %s of %s not found", attrtype, name);
-            }
+            string ret = "";
 
-            return "";
+            foreach (unowned XmlObject child in childs_unsorted)
+            {
+                if (child is List)
+                {
+                    (child as List).name = (parent as Switch).name;
+                    (child as List).generic_name = (parent as Switch).generic_name;
+                    ret += child.to_string (inPrefix);
+                    break;
+                }
+            }
+            return ret;
         }
     }
 }

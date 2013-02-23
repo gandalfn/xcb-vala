@@ -173,6 +173,11 @@ namespace XCBVala
                 Root.format_vala_name (name) == "GContext" ||
                 Root.format_vala_name (name) == "Font")
             {
+                ret += inPrefix + "\t/**\n";
+                ret += inPrefix + "\t * Allocates an XID for a new %s.\n".printf (Root.format_vala_name (name));
+                ret += inPrefix + "\t *\n";
+                ret += inPrefix + "\t * @param connection The connection.\n";
+                ret += inPrefix + "\t */\n";
                 ret += inPrefix + "\t[CCode (cname = \"xcb_generate_id\")]\n";
                 ret += inPrefix + "\tpublic %s (Xcb.Connection connection);\n\n".printf (Root.format_vala_name (name));
             }

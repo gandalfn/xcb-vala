@@ -28,6 +28,8 @@ namespace XCBVala
         private unowned XmlObject m_Owner;
         private int               m_OwnerPos = -1;
         private unowned Reply?    m_Reply = null;
+        private int               m_NbGenerics = -1;
+        private unowned Doc?      m_Doc = null;
 
         // accessors
         protected string tag_name {
@@ -47,6 +49,7 @@ namespace XCBVala
         public string  name           { get; set; default = null; }
         public int     pos            { get; set; default = 0; }
         public string  characters     { get; set; default = null; }
+
         public XmlObject owner {
             get {
                 return m_Owner;
@@ -100,11 +103,18 @@ namespace XCBVala
             return ret;
         }
 
+        public char
+        add_generic ()
+        {
+            m_NbGenerics++;
+            return 'A' + (char)m_NbGenerics;
+        }
+
         public bool
         search_owner (XmlObject inRoot)
         {
-            GLib.List<unowned XIDType> xid_types = inRoot.find_childs_of_type<XIDType> ();
-            GLib.List<unowned XIDUnion> xid_unions = inRoot.find_childs_of_type<XIDUnion> ();
+            GLib.List<unowned XIDType> xid_types = inRoot.find_childs_of_type<XIDType> (false);
+            GLib.List<unowned XIDUnion> xid_unions = inRoot.find_childs_of_type<XIDUnion> (false);
             GLib.List<unowned Field> fields = find_childs_of_type<Field> (false);
             foreach (unowned Field field in fields)
             {
@@ -144,6 +154,10 @@ namespace XCBVala
             {
                 m_Reply = inChild as Reply;
             }
+            else if (inChild is Doc)
+            {
+                m_Doc = inChild as Doc;
+            }
         }
 
         public void
@@ -167,12 +181,18 @@ namespace XCBVala
 
             for (int cpt = 0; cpt < nb; ++cpt)
             {
+                if (m_Doc != null)
+                {
+                    ret += m_Doc.to_string (inPrefix);
+                }
+                ret += inPrefix + "[CCode (cname = \"xcb_%s%s\"".printf (Root.format_c_name ((root as Root).extension_name, name),
+                                                                         suffix[cpt]);
                 if (m_OwnerPos >= 0)
                 {
                     GLib.List<unowned Field> fields = find_childs_of_type<unowned Field> ();
                     if (m_OwnerPos == fields.length ())
                     {
-                        ret += inPrefix + "[CCode (cname = \"xcb_%s%s\", instance_pos=-1)]\n".printf (Root.format_c_name ((root as Root).extension_name, name), suffix[cpt]);
+                        ret += ", instance_pos = -1";
                     }
                     else
                     {
@@ -183,31 +203,49 @@ namespace XCBVala
                             if (list.array_len_pos + 1 <= m_OwnerPos)
                                 pos = int.max (--pos, 0);
                         }
-                        ret += inPrefix + "[CCode (cname = \"xcb_%s%s\", instance_pos=%i.%i)]\n".printf (Root.format_c_name ((root as Root).extension_name, name), suffix[cpt],
-                                                                                                         pos + 1, m_OwnerPos + 1);
+                        ret += ", instance_pos = %i.%i".printf (pos + 1, m_OwnerPos + 1);
                     }
                 }
-                else
-                    ret += inPrefix + "[CCode (cname = \"xcb_%s%s\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name), suffix[cpt]);
+
+                if (m_NbGenerics >= 0)
+                {
+                    ret += ", simple_generics = true";
+                }
+
+                ret += ")]\n";
 
                 string reply = "VoidCookie";
                 if (m_Reply != null)
                     reply = "%sCookie".printf (Root.format_vala_name (name));
 
+                ret += inPrefix + "public %s %s%s".printf (reply, format_function_name (), suffix[cpt]);
+                if (m_NbGenerics >= 0)
+                {
+                    ret += "<";
+                    for (int j = 0; j <= m_NbGenerics; ++j)
+                    {
+                        if (j == 0)
+                            ret += "%c".printf ('A' + (char)m_NbGenerics);
+                        else
+                            ret += ", %c".printf ('A' + (char)m_NbGenerics);
+                    }
+                    ret += ">";
+                }
+
                 bool first = true;
                 if (m_Owner != null)
                 {
-                    ret += inPrefix + "public %s %s%s (Xcb.Connection connection".printf (reply, format_function_name (), suffix[cpt]);
+                    ret += " (Xcb.Connection connection";
                     first = false;
                 }
                 else
                 {
-                    ret += inPrefix + "public %s %s%s (".printf (reply, format_function_name (), suffix[cpt]);
-                    first = true;
+                    ret += " (";
                 }
+
                 foreach (unowned XmlObject child in childs_unsorted)
                 {
-                    if (!(child is Reply))
+                    if (!(child is Reply) && !(child is Doc))
                     {
                         if (child.pos != m_OwnerPos)
                         {
