@@ -192,7 +192,7 @@ namespace XCBVala
                         {
                             int pos = m_ArrayLenPos + 1;
                             if ((p as Request).owner_pos <= m_ArrayLenPos)
-                                pos = int.max (m_ArrayLenPos, 1);
+                                pos = int.max (m_ArrayLenPos, 0);
                             ret += inPrefix +  "[CCode (array_length_pos = %i.%i)]".printf (pos, m_ArrayLenPos + 1);
                         }
 
