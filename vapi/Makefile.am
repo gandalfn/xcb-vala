@@ -20,6 +20,12 @@ xcb-dpms.vapi: @XCB_XML_PATH@/dpms.xml
 xcb-dri2.vapi: @XCB_XML_PATH@/dri2.xml
 	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
 
+xcb-dri3.vapi: @XCB_XML_PATH@/dri3.xml
+	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+
+xcb-present.vapi: @XCB_XML_PATH@/present.xml
+	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
+
 xcb-ge.vapi: @XCB_XML_PATH@/ge.xml
 	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
 
@@ -100,6 +106,7 @@ vapi_DATA = \
 	xcb-damage.vapi \
 	xcb-dpms.vapi \
 	xcb-dri2.vapi \
+	xcb-dri3.vapi \
 	xcb-ge.vapi \
 	xcb-glx.vapi \
 	xcb-randr.vapi \
@@ -111,6 +118,7 @@ vapi_DATA = \
 	xcb-shape.vapi \
 	xcb-shm.vapi \
 	xcb-sync.vapi \
+	xcb-present.vapi \
 	xcb-xc_misc.vapi \
 	xcb-xevie.vapi \
 	xcb-xf86dri.vapi \
@@ -131,6 +139,8 @@ vapi_DATA = \
 	xcb-damage.deps \
 	xcb-dpms.deps \
 	xcb-dri2.deps \
+	xcb-dri3.deps \
+	xcb-present.deps \
 	xcb-ge.deps \
 	xcb-glx.deps \
 	xcb-randr.deps \
@@ -163,6 +173,8 @@ CLEANFILES = \
 	xcb-damage.vapi \
 	xcb-dpms.vapi \
 	xcb-dri2.vapi \
+	xcb-dri3.vapi \
+	xcb-present.vapi \
 	xcb-ge.vapi \
 	xcb-glx.vapi \
 	xcb-randr.vapi \
@@ -193,6 +205,8 @@ CLEANFILES = \
 	xcb-damage.deps \
 	xcb-dpms.deps \
 	xcb-dri2.deps \
+	xcb-dri3.deps \
+	xcb-present.deps \
 	xcb-ge.deps \
 	xcb-glx.deps \
 	xcb-randr.deps \

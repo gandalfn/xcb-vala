@@ -75,6 +75,9 @@ namespace XCBVala
             if (characters == "xfixes")
                 return "using Xcb.XFixes;\n";
 
+            if (characters == "randr")
+                return "using Xcb.RandR;\n";
+
             return "using Xcb.%s;\n".printf (Root.format_vala_name (characters));
         }
     }

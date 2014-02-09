@@ -170,9 +170,13 @@ main (string[] inArgs)
     test_cookie (window_cookie, connection, "can't create window");
     window.map (connection);
 
+    Xcb.Glx.Window glx_window = (Xcb.Glx.Window)Xcb.Window (connection);
+    Xcb.VoidCookie cookie_create_window = fbconfig.create_window ((Xcb.Glx.Connection)connection, screenNum, window, glx_window, null);
+    test_cookie (cookie_create_window, connection, "can't create glx window");
+
     /* making our glx context current */
     Xcb.GenericError error;
-    Xcb.Glx.MakeContextCurrentCookie cookie_make_current = ((Xcb.Glx.Drawable)window).make_context_current((Xcb.Glx.Connection)connection, 0, (Xcb.Glx.Drawable)window, context);
+    Xcb.Glx.MakeContextCurrentCookie cookie_make_current = ((Xcb.Glx.Drawable)glx_window).make_context_current((Xcb.Glx.Connection)connection, 0, (Xcb.Glx.Drawable)glx_window, context);
     Xcb.Glx.MakeContextCurrentReply reply_make_current = cookie_make_current.reply ((Xcb.Glx.Connection)connection, out error);
     if (error != null)
     {
@@ -224,7 +228,7 @@ main (string[] inArgs)
                 GL.glEnd ();
                 GL.glFinish ();
 
-                ((Xcb.Glx.Drawable)window).swap_buffers ((Xcb.Glx.Connection)connection, tag);
+                ((Xcb.Glx.Drawable)glx_window).swap_buffers ((Xcb.Glx.Connection)connection, tag);
 
                 break;
 

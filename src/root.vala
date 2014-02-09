@@ -81,6 +81,10 @@ namespace XCBVala
             {
                 is_first = 2;
             }
+            else if (inName.has_prefix ("XF"))
+            {
+                is_first = 2;
+            }
             else if (inName.has_prefix ("XI"))
             {
                 is_first = 3;
@@ -267,6 +271,7 @@ namespace XCBVala
             ValueType.add_simple ("CARD8",  "uint8",  extension_name);
             ValueType.add_simple ("CARD16", "uint16", extension_name);
             ValueType.add_simple ("CARD32", "uint32", extension_name);
+            ValueType.add_simple ("CARD64", "uint64", extension_name);
             ValueType.add_simple ("BYTE",   "uint8",  extension_name);
             ValueType.add_simple ("BOOL",   "bool",   extension_name);
             ValueType.add_simple ("char",   "char",   extension_name);
@@ -358,21 +363,34 @@ namespace XCBVala
                 }
             }
 
-            events = find_childs_of_type<unowned Event> ();
-            if (events.length () > 0)
+            GLib.List<unowned Enum> enums = find_childs_of_type<unowned Enum> ();
+            bool have_event_enum = false;
+            foreach (unowned Enum @enum in enums)
             {
-                events.sort (Event.compare_number);
-
-                Enum event_enum = new Enum ();
-                event_enum.name = "EventType";
-                append_child (event_enum);
-
-                foreach (unowned Event event in events)
+                if (@enum.name == "Event" && @enum.have_type_suffix)
                 {
-                    Item item = new Item ();
-                    item.name = event.event_name;
+                    have_event_enum = true;
+                    break;
+                }
+            }
+            if (!have_event_enum)
+            {
+                events = find_childs_of_type<unowned Event> ();
+                if (events.length () > 0)
+                {
+                    events.sort (Event.compare_number);
 
-                    event_enum.append_child (item);
+                    Enum event_enum = new Enum ();
+                    event_enum.name = "EventType";
+                    append_child (event_enum);
+
+                    foreach (unowned Event event in events)
+                    {
+                        Item item = new Item ();
+                        item.name = event.event_name;
+
+                        event_enum.append_child (item);
+                    }
                 }
             }
         }

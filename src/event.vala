@@ -108,7 +108,7 @@ namespace XCBVala
                 ret += m_Doc.to_string (inPrefix);
             }
             ret += inPrefix + "[Compact, CCode (cname = \"xcb_%s_event_t\", has_type_id = false)]\n".printf (Root.format_c_name ((root as Root).extension_name, m_Name));
-            ret += inPrefix + "public class %sEvent : GenericEvent {\n".printf (Root.format_vala_name (m_Name));
+            ret += inPrefix + "public class %sEvent : Xcb.GenericEvent {\n".printf (Root.format_vala_name (m_Name));
             foreach (unowned XmlObject child in childs_unsorted)
             {
                 if (!(child is Doc))

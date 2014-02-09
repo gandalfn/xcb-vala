@@ -196,7 +196,7 @@ namespace XCBVala
                             ret += inPrefix +  "[CCode (array_length_pos = %i.%i)]".printf (pos, m_ArrayLenPos + 1);
                         }
 
-                        ret += "%s[] %s".printf (attrtype_valuetype (), name);
+                        ret += "%s[]? %s".printf (attrtype_valuetype (), name);
                     }
                     else if (p is Reply)
                     {
@@ -238,7 +238,7 @@ namespace XCBVala
                     if (p is Request)
                     {
                         ret += inPrefix + "[CCode (array_length_pos = %i.%i)]".printf (pos, pos);
-                        ret += "%s[] %s".printf (attrtype_valuetype (), name);
+                        ret += "%s[]? %s".printf (attrtype_valuetype (), name);
                     }
                     else if (p is Reply)
                     {
