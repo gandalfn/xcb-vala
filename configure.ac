@@ -27,7 +27,7 @@ dnl Packages version required
 dnl ****************************************************************************
 GLIB_REQUIRED=2.32.0
 VALA_REQUIRED=0.20.0
-XCB_PROTO_REQUIRED=0.10.0
+XCB_PROTO_REQUIRED=1.10
 
 dnl ****************************************************************************
 dnl Check for vala
