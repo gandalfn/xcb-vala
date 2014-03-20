@@ -24,6 +24,8 @@ namespace XCBVala
     public class ErrorCopy : GLib.Object, XmlObject
     {
         // properties
+        private string m_Name;
+        private string m_Ref;
         private Set<XmlObject> m_Childs;
 
         // accessors
@@ -41,11 +43,28 @@ namespace XCBVala
             }
         }
 
-        public string name           { get; set; default = null; }
+        public string name {
+            get {
+                return m_Name;
+            }
+            set {
+                m_Name = value + "Error";
+            }
+            default = null;
+        }
+
         public int    pos            { get; set; default = 0; }
         public string characters     { get; set; default = null; }
         public int    number         { get; set; default = 0; }
-        public new string @ref       { get; set; default = null; }
+        public new string @ref {
+            get {
+                return m_Ref;
+            }
+            set {
+                m_Ref = value + "Error";
+            }
+            default = null;
+        }
 
         // methods
         construct

@@ -26,15 +26,8 @@ dnl ****************************************************************************
 dnl Packages version required
 dnl ****************************************************************************
 GLIB_REQUIRED=2.32.0
-VALA_REQUIRED=0.20.0
+VALA_REQUIRED=0.22.0
 XCB_PROTO_REQUIRED=1.10
-
-dnl ****************************************************************************
-dnl Check for vala
-dnl ****************************************************************************
-AM_PROG_VALAC($VALA_REQUIRED)
-VALA_VAPI_PATH=$($PKG_CONFIG --variable=vapidir libvala-0.18)
-AC_SUBST(VALA_VAPI_PATH)
 
 dnl ****************************************************************************
 dnl Check for packages
@@ -48,6 +41,13 @@ PKG_CHECK_MODULES(XCB_VALA, [glib-2.0 >= $GLIB_REQUIRED
                              gl])
 AC_SUBST(XCB_VALA_CFLAGS)
 AC_SUBST(XCB_VALA_LIBS)
+
+dnl ****************************************************************************
+dnl Check for vala
+dnl ****************************************************************************
+AM_PROG_VALAC($VALA_REQUIRED)
+VALA_VAPI_PATH=$($PKG_CONFIG --variable=vapidir libvala-0.22)
+AC_SUBST(VALA_VAPI_PATH)
 
 dnl ****************************************************************************
 dnl Check for valadoc

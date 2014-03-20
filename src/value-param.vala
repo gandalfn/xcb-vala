@@ -77,7 +77,7 @@ namespace XCBVala
 
             if (parent is Request)
             {
-                GLib.List<unowned Field> fields = parent.find_childs_of_type<Field> ();
+                GLib.List<unowned Field> fields = parent.find_childs_of_type<Field> (false);
 
                 foreach (unowned Field child in fields)
                 {

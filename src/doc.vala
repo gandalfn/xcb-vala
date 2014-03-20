@@ -58,6 +58,45 @@ namespace XCBVala
             name = "doc-%lu".printf (s_Count);
         }
 
+        private string
+        generate_param (string inName, string inPrefix)
+        {
+            string ret = "";
+            unowned XmlObject? found = childs.search<string> (inName, XmlObject.compare_with_name);
+            if (found is Field)
+            {
+                string begin = "@param %s ".printf (found.name);
+                string pad = string.nfill (begin.length, ' ');
+
+                ret += inPrefix + " * " + begin;
+                if (found.characters != null)
+                {
+                    bool is_first = true;
+                    foreach (string line in found.characters_unformatted.split ("\n"))
+                    {
+                        string l = line.strip ();
+                        if (l.length > 0)
+                        {
+                            if (is_first)
+                                ret += l + "\n";
+                            else
+                                ret += inPrefix + " * " + pad + l + "\n";
+                            is_first = false;
+                        }
+                    }
+                    if (is_first)
+                    {
+                        ret += "%s\n".printf (found.name);
+                    }
+                }
+                else
+                {
+                    ret += "%s\n".printf (found.name);
+                }
+            }
+            return ret;
+        }
+
         public void
         on_child_added (XmlObject inChild)
         {
@@ -126,6 +165,31 @@ namespace XCBVala
                 }
             }
 
+            string errors = "";
+            foreach (unowned XmlObject? child in childs_unsorted)
+            {
+                if (child is Error)
+                {
+                    errors += inPrefix + " *  * {@link " + ((Error)child).attrtype + "}: ";
+
+                    if (child.characters != null)
+                    {
+                        foreach (string line in child.characters_unformatted.split ("\n"))
+                        {
+                            errors += line.strip () + " ";
+                        }
+                        errors += "\n";
+                    }
+                }
+            }
+            if (errors != "")
+            {
+                ret += inPrefix + " * = Errors: =\n";
+                ret += inPrefix + " *\n";
+                ret += errors;
+                ret += inPrefix + " *\n";
+            }
+
             if (parent is Request)
             {
                 if ((parent as Request).owner != null)
@@ -135,41 +199,16 @@ namespace XCBVala
 
                 foreach (unowned XmlObject? child in parent.childs_unsorted)
                 {
-                    if ((child is Field && !(child as Field).is_ref && (child as Field).pos != (parent as Request).owner_pos) ||
+                    if ((child is Field && !(child as Field).is_ref &&
+                         (child as Field).pos != (parent as Request).owner_pos) ||
                         (child is List))
                     {
-                        unowned XmlObject? found = childs.search<string> (child.name, XmlObject.compare_with_name);
-                        if (found is Field)
-                        {
-                            string begin = "@param %s ".printf (found.name);
-                            string pad = string.nfill (begin.length, ' ');
-
-                            ret += inPrefix + " * " + begin;
-                            if (found.characters != null)
-                            {
-                                bool is_first = true;
-                                foreach (string line in found.characters_unformatted.split ("\n"))
-                                {
-                                    string l = line.strip ();
-                                    if (l.length > 0)
-                                    {
-                                        if (is_first)
-                                            ret += l + "\n";
-                                        else
-                                            ret += inPrefix + " * " + pad + l + "\n";
-                                        is_first = false;
-                                    }
-                                }
-                                if (is_first)
-                                {
-                                    ret += "%s\n".printf (found.name);
-                                }
-                            }
-                            else
-                            {
-                                ret += "%s\n".printf (found.name);
-                            }
-                        }
+                        ret += generate_param (child.name, inPrefix);
+                    }
+                    else if (child is ValueParam)
+                    {
+                        ret += generate_param (((ValueParam)child).value_mask_name, inPrefix);
+                        ret += generate_param (((ValueParam)child).value_list_name, inPrefix);
                     }
                 }
             }

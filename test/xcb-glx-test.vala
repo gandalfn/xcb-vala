@@ -207,6 +207,7 @@ main (string[] inArgs)
         switch (event.response_type & ~0x80)
         {
             case Xcb.EventType.EXPOSE:
+		print ("DRAWWWWWW\n");
                 // redrawing our scene
                 GL.glClear (GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 
@@ -214,10 +215,10 @@ main (string[] inArgs)
                 GL.glMatrixMode (GL.GL_PROJECTION);
                 GL.glLoadIdentity ();
                 // adding some perspective
-                GL.glFrustum (-1.0f , 1.0f , -1.0f, 1.0f, 1.0f, 1000.0f);
+                GL.glFrustum (-1.0f , 1.0f , -1.0f, 1.0f, 0.1f, 10000.0f);
                 GL.glMatrixMode (GL.GL_MODELVIEW);
                 GL.glLoadIdentity ();
-                GL.glTranslatef (0.0f, 0.0f, -2.0f); // moving camera back, so i can see stuff i draw
+                GL.glTranslatef (0.0f, 0.0f, 2.0f); // moving camera back, so i can see stuff i draw
 
                 // drawing a triangle to test
                 GL.glBegin (GL.GL_TRIANGLES);
@@ -229,6 +230,7 @@ main (string[] inArgs)
                 GL.glFinish ();
 
                 ((Xcb.Glx.Drawable)glx_window).swap_buffers ((Xcb.Glx.Connection)connection, tag);
+    		connection.flush ();
 
                 break;
 

@@ -398,8 +398,8 @@ namespace XCBVala
         private void
         update_errors ()
         {
-            GLib.List<unowned ErrorCopy> error_copys = find_childs_of_type<unowned ErrorCopy> ();
-            GLib.List<unowned Error> errors = find_childs_of_type<unowned Error> ();
+            GLib.List<unowned ErrorCopy> error_copys = find_childs_of_type<unowned ErrorCopy> (false);
+            GLib.List<unowned Error> errors = find_childs_of_type<unowned Error> (false);
             foreach (unowned ErrorCopy error_copy in error_copys)
             {
                 if (error_copy.@ref != null)
@@ -483,11 +483,11 @@ namespace XCBVala
         {
             update_imports ();
 
+            update_errors ();
+
             update_field_types ();
 
             update_events ();
-
-            update_errors ();
 
             update_requests ();
         }
@@ -496,7 +496,7 @@ namespace XCBVala
         to_string (string inPrefix)
         {
             string ret = inPrefix + "/*\n" +
-                         inPrefix + " * Copyright (C) 2012  Nicolas Bruguier\n" +
+                         inPrefix + " * Copyright (C) 2012-2014  Nicolas Bruguier\n" +
                          inPrefix + " *\n" +
                          inPrefix + " * This library is free software: you can redistribute it and/or modify\n" +
                          inPrefix + " * it under the terms of the GNU Lesser General Public License as published by\n" +

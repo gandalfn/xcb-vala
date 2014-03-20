@@ -25,6 +25,8 @@ namespace XCBVala
     {
         // properties
         private Set<XmlObject> m_Childs;
+        private string m_Name;
+        private string m_Type;
 
         // accessors
         protected string tag_name {
@@ -41,7 +43,23 @@ namespace XCBVala
             }
         }
 
-        public string name           { get; set; default = null; }
+        public string name {
+            get {
+                return m_Name;
+            }
+            set {
+                m_Name = value + "Error";
+            }
+            default = null;
+        }
+        public string attrtype {
+            get {
+                return m_Type;
+            }
+            set {
+                m_Type = value + "Error";
+            }
+        }
         public int    pos            { get; set; default = 0; }
         public string characters     { get; set; default = null; }
         public int    number         { get; set; default = 0; }
@@ -56,7 +74,7 @@ namespace XCBVala
         copy (string inName, int inNumber)
         {
             Error error = new Error ();
-            error.name = inName;
+            error.m_Name = inName;
             error.number = inNumber;
 
             foreach (unowned XmlObject child in this)
@@ -79,9 +97,9 @@ namespace XCBVala
         public string
         to_string (string inPrefix)
         {
-            string ret = inPrefix + "[Compact, CCode (cname = \"xcb_%s_error_t\", has_type_id = false)]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
+            string ret = inPrefix + "[Compact, CCode (cname = \"xcb_%s_t\", has_type_id = false)]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
 
-            ret += inPrefix + "public class %sError : Xcb.GenericError {\n".printf (Root.format_vala_name (name));
+            ret += inPrefix + "public class %s : Xcb.GenericError {\n".printf (Root.format_vala_name (name));
             foreach (unowned XmlObject child in childs_unsorted)
             {
                 ret += child.to_string (inPrefix + "\t");
