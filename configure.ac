@@ -27,7 +27,7 @@ dnl Packages version required
 dnl ****************************************************************************
 GLIB_REQUIRED=2.32.0
 VALA_REQUIRED=0.22.0
-XCB_PROTO_REQUIRED=1.10
+XCB_PROTO_REQUIRED=1.8
 
 dnl ****************************************************************************
 dnl Check for packages
@@ -41,6 +41,8 @@ PKG_CHECK_MODULES(XCB_VALA, [glib-2.0 >= $GLIB_REQUIRED
                              gl])
 AC_SUBST(XCB_VALA_CFLAGS)
 AC_SUBST(XCB_VALA_LIBS)
+
+AM_CONDITIONAL(XCB_1_10, [$PKG_CONFIG xcb-proto >= 1.10])
 
 dnl ****************************************************************************
 dnl Check for vala
