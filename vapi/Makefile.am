@@ -26,7 +26,7 @@ xcb-dri3.vapi: @XCB_XML_PATH@/dri3.xml
 
 xcb-present.vapi: @XCB_XML_PATH@/present.xml
 	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
-endif 
+endif
 
 xcb-ge.vapi: @XCB_XML_PATH@/ge.xml
 	$(AM_V_GEN)${top_builddir}/src/xcb-vapigen $< $@
@@ -165,7 +165,7 @@ vapi_DATA = \
 	xcb-xkb.deps
 
 if XCB_1_10
-vapi_DATA +=
+vapi_DATA += \
 	xcb-dri3.vapi \
 	xcb-present.vapi \
 	xcb-dri3.deps \

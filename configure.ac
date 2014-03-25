@@ -42,7 +42,7 @@ PKG_CHECK_MODULES(XCB_VALA, [glib-2.0 >= $GLIB_REQUIRED
 AC_SUBST(XCB_VALA_CFLAGS)
 AC_SUBST(XCB_VALA_LIBS)
 
-AM_CONDITIONAL(XCB_1_10, [$PKG_CONFIG xcb-proto >= 1.10])
+AM_CONDITIONAL(XCB_1_10, test "$PKG_CONFIG xcb-proto >= 1.10")
 
 dnl ****************************************************************************
 dnl Check for vala

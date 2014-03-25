@@ -499,7 +499,7 @@ namespace XCBVala
                           inPrefix + " * Copyright (C) 2012-2014  Nicolas Bruguier\n" +
                           inPrefix + " * All Rights Reserved.\n" +
                           inPrefix + " *\n" +
-                          inPrefix + " *Permission is hereby granted, free of charge, to any person obtaining a\n" +
+                          inPrefix + " * Permission is hereby granted, free of charge, to any person obtaining a\n" +
                           inPrefix + " * copy of this software and associated documentation files (the \"Software\"),\n" +
                           inPrefix + " * to deal in the Software without restriction, including without limitation\n" +
                           inPrefix + " * the rights to use, copy, modify, merge, publish, distribute, sublicense,\n" +

@@ -69,12 +69,12 @@ namespace XCBVala
 
             if (name.down () == "setup" || name.down () == "screen")
             {
-                ret = inPrefix + "[Compact, Immutable, CCode (cname = \"xcb_%s_t\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
+                ret  = inPrefix + "[Compact, Immutable, CCode (cname = \"xcb_%s_t\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
                 ret += inPrefix + "public class %s {\n".printf (Root.format_vala_name (name));
             }
             else
             {
-                ret = inPrefix + "[SimpleType, CCode (cname = \"xcb_%s_iterator_t\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
+                ret  = inPrefix + "[SimpleType, CCode (cname = \"xcb_%s_iterator_t\")]\n".printf (Root.format_c_name ((root as Root).extension_name, name));
                 ret += inPrefix + "struct _%sIterator\n".printf (Root.format_vala_name (name));
                 ret += inPrefix + "{\n";
                 ret += inPrefix + "\tinternal int rem;\n";
