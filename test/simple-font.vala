@@ -23,7 +23,7 @@ get_font_gc (Xcb.Connection connection, Xcb.Screen screen, Xcb.Window window, st
     int32           mask          = Xcb.GC.FOREGROUND | Xcb.GC.BACKGROUND | Xcb.GC.FONT;
     uint32[]        value_list    = { screen.black_pixel, screen.white_pixel, font };
 
-    Xcb.VoidCookie gc_cookie = gc.create_gc_checked (connection, window, mask, value_list );
+    Xcb.VoidCookie gc_cookie = gc.create_checked (connection, window, mask, value_list );
 
     test_cookie (gc_cookie, connection, "can't create gc");
 
@@ -51,7 +51,7 @@ draw_text (Xcb.Connection connection, Xcb.Screen screen, Xcb.Window window,
 
 
     /* free the gc */
-    Xcb.VoidCookie gc_cookie = gc.free_gc (connection);
+    Xcb.VoidCookie gc_cookie = gc.free (connection);
 
     test_cookie(gc_cookie, connection, "can't free gc");
 }

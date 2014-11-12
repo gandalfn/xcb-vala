@@ -97,9 +97,9 @@ namespace XCBVala
             if (name == "EventType")
             {
                 if ((root as Root).extension_name != null)
-                    ret += inPrefix + "[CCode (cname = \"uint8\", cprefix =  \"XCB_%s\", has_type_id = false)]\n".printf (Root.format_c_enum_name ((root as Root).extension_name, ""));
+                    ret += inPrefix + "[CCode (cname = \"guint8\", cprefix =  \"XCB_%s\", has_type_id = false)]\n".printf (Root.format_c_enum_name ((root as Root).extension_name, ""));
                 else
-                    ret += inPrefix + "[CCode (cname = \"uint8\", cprefix =  \"XCB_\", has_type_id = false)]\n";
+                    ret += inPrefix + "[CCode (cname = \"guint8\", cprefix =  \"XCB_\", has_type_id = false)]\n";
             }
             else if (!is_mask)
                 ret += inPrefix + "[CCode (cname = \"xcb_%s_t\", cprefix =  \"XCB_%s_\", has_type_id = false)]\n".printf (Root.format_c_name ((root as Root).extension_name, name), Root.format_c_enum_name ((root as Root).extension_name, name));

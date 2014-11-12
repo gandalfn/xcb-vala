@@ -573,9 +573,9 @@ namespace Xcb
         [SimpleType, CCode (cname = "xcb_screen_iterator_t")]
         struct _Iterator
         {
-            internal int rem;
-            internal int index;
-            internal unowned Screen? data;
+            int rem;
+            int index;
+            unowned Screen? data;
         }
 
         /**
@@ -585,7 +585,7 @@ namespace Xcb
         public struct Iterator
         {
             [CCode (cname = "xcb_screen_next")]
-            internal void _next ();
+            void _next ();
 
             /**
              * Gets the next screen in the screen list.

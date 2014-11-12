@@ -186,6 +186,17 @@ namespace XCBVala
         }
 
         public static string
+        format_c_field_name (string inFieldName)
+        {
+            if (inFieldName.down () == "class")
+                return "_class";
+            if (inFieldName.down () == "delete")
+                return "_delete";
+
+            return inFieldName;
+        }
+
+        public static string
         format_c_name (string? inExtensionName, string inName)
         {
             GLib.StringBuilder ret = new GLib.StringBuilder("");

@@ -68,9 +68,9 @@ namespace XCBVala
                 if (attrtype != null && ValueType.get (attrtype) != null)
                 {
                     if (parent is Request)
-                        return inPrefix + "%s %s".printf (ValueType.get (attrtype), name);
+                        return inPrefix + "%s %s".printf (ValueType.get (attrtype), Root.format_c_field_name (name));
                     else
-                        return inPrefix + "public %s %s;\n".printf (ValueType.get (attrtype), name);
+                        return inPrefix + "public %s %s;\n".printf (ValueType.get (attrtype), Root.format_c_field_name (name));
                 }
                 else
                     warning ("Type %s of %s not found", attrtype, name);

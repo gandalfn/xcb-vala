@@ -26,7 +26,7 @@ dnl ****************************************************************************
 dnl Packages version required
 dnl ****************************************************************************
 GLIB_REQUIRED=2.32.0
-VALA_REQUIRED=0.22.0
+VALA_REQUIRED=0.26.0
 XCB_PROTO_REQUIRED=1.8
 
 dnl ****************************************************************************
@@ -48,7 +48,8 @@ dnl ****************************************************************************
 dnl Check for vala
 dnl ****************************************************************************
 AM_PROG_VALAC($VALA_REQUIRED)
-VALA_VAPI_PATH=$($PKG_CONFIG --variable=vapidir libvala-0.22)
+VALA_ABI=$($VALAC --version | sed 's/Vala  *//' | cut -d'.' -f1,2)
+VALA_VAPI_PATH=$($PKG_CONFIG --variable=vapidir libvala-$VALA_ABI)
 AC_SUBST(VALA_VAPI_PATH)
 
 dnl ****************************************************************************

@@ -138,16 +138,16 @@ namespace XCBVala
                 ret += inPrefix + "[SimpleType, CCode (cname = \"xcb_%s_iterator_t\")]\n".printf (cname);
                 ret += inPrefix + "struct _%sIterator\n".printf (Root.format_vala_name (name));
                 ret += inPrefix + "{\n";
-                ret += inPrefix + "\tinternal int rem;\n";
-                ret += inPrefix + "\tinternal int index;\n";
-                ret += inPrefix + "\tinternal unowned %s? data;\n".printf (Root.format_vala_name (name));
+                ret += inPrefix + "\tint rem;\n";
+                ret += inPrefix + "\tint index;\n";
+                ret += inPrefix + "\tunowned %s? data;\n".printf (Root.format_vala_name (name));
                 ret += inPrefix + "}\n\n";
 
                 ret += inPrefix + "[CCode (cname = \"xcb_%s_iterator_t\")]\n".printf (cname);
                 ret += inPrefix + "public struct %sIterator\n".printf (Root.format_vala_name (name));
                 ret += inPrefix + "{\n";
                 ret += inPrefix + "\t[CCode (cname = \"xcb_%s_next\")]\n".printf (cname);
-                ret += inPrefix + "\tinternal void _next ();\n\n";
+                ret += inPrefix + "\tvoid _next ();\n\n";
                 ret += inPrefix + "\tpublic inline unowned %s?\n".printf (Root.format_vala_name (name));
                 ret += inPrefix + "\tnext_value ()\n";
                 ret += inPrefix + "\t{\n";

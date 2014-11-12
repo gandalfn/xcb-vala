@@ -65,7 +65,7 @@ namespace XCBVala
             unowned XmlObject? found = childs.search<string> (inName, XmlObject.compare_with_name);
             if (found is Field)
             {
-                string begin = "@param %s ".printf (found.name);
+                string begin = "@param %s ".printf (Root.format_c_field_name (found.name));
                 string pad = string.nfill (begin.length, ' ');
 
                 ret += inPrefix + " * " + begin;
@@ -86,12 +86,12 @@ namespace XCBVala
                     }
                     if (is_first)
                     {
-                        ret += "%s\n".printf (found.name);
+                        ret += "%s\n".printf (Root.format_c_field_name (found.name));
                     }
                 }
                 else
                 {
-                    ret += "%s\n".printf (found.name);
+                    ret += "%s\n".printf (Root.format_c_field_name (found.name));
                 }
             }
             return ret;

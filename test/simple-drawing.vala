@@ -35,7 +35,7 @@ main (string[] inArgs)
     uint32 mask = Xcb.GC.FOREGROUND | Xcb.GC.GRAPHICS_EXPOSURES;
     uint32 values[2] = { screen.black_pixel, 0 };
 
-    foreground.create_gc (connection, screen.root, mask, values);
+    foreground.create (connection, screen.root, mask, values);
 
     /* Create the window */
     Xcb.Window window = Xcb.Window (connection);

@@ -85,10 +85,12 @@ namespace XCBVala
 
             if (m_Owner != null)
             {
+                string low_owner_name = m_Owner.name.down ();
+                if (low_owner_name == "gcontext") low_owner_name = "gc";
                 string low_c_name = Root.format_c_name (null, name.down ());
-                string suffix = "_%s".printf (m_Owner.name.down ());
-                string prefix = "%s_".printf (m_Owner.name.down ());
-                string middle = "_%s_".printf (m_Owner.name.down ());
+                string suffix = "_%s".printf (low_owner_name);
+                string prefix = "%s_".printf (low_owner_name);
+                string middle = "_%s_".printf (low_owner_name);
 
                 if (ret.has_suffix (suffix) && (ret.length - suffix.length) > 0)
                     ret = ret.substring (0, ret.length - suffix.length);
@@ -96,8 +98,8 @@ namespace XCBVala
                     ret = ret.substring (prefix.length);
                 else if (middle in ret)
                     ret = ret.replace (middle, "_");
-                else if (low_c_name.has_suffix (m_Owner.name.down ()))
-                    ret = low_c_name.substring (0, low_c_name.length - m_Owner.name.down ().length);
+                else if (low_c_name.has_suffix (low_owner_name))
+                    ret = low_c_name.substring (0, low_c_name.length - low_owner_name.length);
             }
 
             return ret;
